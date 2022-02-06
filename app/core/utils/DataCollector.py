@@ -56,13 +56,22 @@ class DataCollector:
 
         return result_dict
 
+    def check_symbol_exists_on_exchange(self):
+        check_symbol = (requests.get(f'https://api.cryptowat.ch/markets/kraken/{self.coin_symbol}usd/price')).json()
+
+        if "error" in check_symbol and check_symbol["error"]=='Instrument not found':
+            return False
+        else:
+            return True
 
 
     def driver_logic(self):
 
         dataCache = DataCache(self.coin_symbol,self.investment)
 
-        if(dataCache.check_if_valid_final_result_exists()):
+        if(self.check_symbol_exists_on_exchange()==False):
+            return "Symbol doesn\'t exist"
+        elif(dataCache.check_if_valid_final_result_exists()):
             print('A valid cached value exists for this query')
             cached_result = dataCache.get_valid_final_result()
             return cached_result

@@ -17,19 +17,22 @@ def before_request_func():
     current_app.logger.name = 'core'
 
 
-@core.route('/test', methods=['GET'])
+@core.route('/process_request', methods=['GET'])
 def test():
     logger.info('app test route hit')
-    symbol = str(request.args.get('symbol').strip())
-    investment = int(request.args.get('investment'))
+    try:
+        symbol = str(request.args.get('symbol').strip())
+        investment = int(request.args.get('investment'))
 
-    dataCollector = DataCollector(symbol,investment)
-    result = dataCollector.driver_logic()
-    return json.dumps({"message": result}), 200, {"ContentType": "application/json"}
+        dataCollector = DataCollector(symbol,investment)
+        result = dataCollector.driver_logic()
+        return json.dumps({"message": result}), 200, {"ContentType": "application/json"}
+    except:
+        return json.dumps({"message": 'Server Failure'}), 500, {"ContentType": "application/json"}
 
 
 
 @core.route('/restricted', methods=['GET'])
 @check_auth
 def restricted():
-    return 'Congratulations! Your core-app restricted route is running via your API key!'
+    return json.dumps({"message": 'Successful Auth'}), 200, {"ContentType": "application/json"}
