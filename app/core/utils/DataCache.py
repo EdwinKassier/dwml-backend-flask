@@ -25,19 +25,23 @@ class DataCache:
         except Exception as e:
             print(e)
 
-    #The connection will create the db if it doesn't already exist, this will generate the tables if they don't already exist
+    #The set up function will create the db tables if they don't already exist
     def setup_DB(self):
 
         if(not self.check_table_exists('RESULTS')):
             self.create_table('RESULTS')
-        elif(not self.check_table_exists('OPENING_AVERAGE')):
+        
+        if(not self.check_table_exists('OPENING_AVERAGE')):
             self.create_table('OPENING_AVERAGE')
+
+        if(not self.check_table_exists('LOGGING')):
+            self.create_table('LOGGING')
 
         print('DB setup complete')
 
     #Table creation logic
     def create_table(self,table_name):
-        #We will have two tables, one table to cache the results of a full query, and then another table to cache the average price of the coin within the first month of its listing on the exchange
+        #We will have three tables, a RESULTS table to cache the results of a full query, an OPENING_AVERAGE table to cache the average price of the coin within the first month of its listing on the exchange and finally a LOGGING table to log and measure usage
 
         create_final_result_table = '''CREATE TABLE RESULTS
             (QUERY TEXT PRIMARY KEY     NOT NULL,
@@ -53,11 +57,20 @@ class DataCache:
             (SYMBOL CHAR(50) PRIMARY KEY     NOT NULL,
             AVERAGE           REAL    NOT NULL);'''
 
+
+        create_logging_table = '''CREATE TABLE LOGGING
+            (QUERY_ID INTEGER PRIMARY KEY AUTOINCREMENT,
+            SYMBOL            CHAR(50)     NOT NULL,
+            INVESTMENT        INT     NOT NULL,
+            GENERATIONDATE    TEXT     NOT NULL);'''    
+
         try:
             if(table_name=='RESULTS'):
                 self.connection.execute(create_final_result_table)
-            if(table_name=='OPENING_AVERAGE'):
+            elif(table_name=='OPENING_AVERAGE'):
                 self.connection.execute(create_opening_average_table)
+            elif(table_name=='LOGGING'):
+                self.connection.execute(create_logging_table)
 
         except Exception as e:
             print(e)
@@ -67,7 +80,7 @@ class DataCache:
         #Create cursor
         cur = self.connection.cursor()
 
-        query = f"SELECT * from RESULTS WHERE QUERY LIKE '{self.coin_symbol}-{self.investment}%'"
+        query = f"SELECT * from RESULTS WHERE QUERY = '{self.coin_symbol}-{self.investment}'"
 
         cur.execute(query)
 
@@ -86,6 +99,7 @@ class DataCache:
             if(days_since_query<7):
                 return True
             else:
+                #There exists a cached value, but it is stale
                 return False
         else:
             #There doesn\'t exist a valid historical query
@@ -96,7 +110,7 @@ class DataCache:
          #Create cursor
         cur = self.connection.cursor()
 
-        query = f"SELECT * from RESULTS WHERE QUERY LIKE '{self.coin_symbol}-{self.investment}%'"
+        query = f"SELECT * from RESULTS WHERE QUERY = '{self.coin_symbol}-{self.investment}'"
 
         cur.execute(query)
 
@@ -116,7 +130,7 @@ class DataCache:
         #Create cursor
         cur = self.connection.cursor()
 
-        query = f"SELECT * from OPENING_AVERAGE WHERE SYMBOL LIKE '{self.coin_symbol}%'"
+        query = f"SELECT * from OPENING_AVERAGE WHERE SYMBOL = '{self.coin_symbol}'"
 
         cur.execute(query)
 
@@ -136,7 +150,7 @@ class DataCache:
         #Create cursor
         cur = self.connection.cursor()
 
-        query = f"SELECT * from OPENING_AVERAGE WHERE SYMBOL LIKE '{self.coin_symbol}%'"
+        query = f"SELECT * from OPENING_AVERAGE WHERE SYMBOL = '{self.coin_symbol}'"
 
         cur.execute(query)
 
@@ -149,8 +163,25 @@ class DataCache:
         else:
             return {}
 
+    #Insert current query into the logging table
+    def insert_into_logging(self):
 
-    #Insert final result from data collector into the db
+        combined_results = {'SYMBOL':self.coin_symbol,'INVESTMENT':self.investment, 'GENERATIONDATE':datetime.now().isoformat()}
+
+        columns = ', '.join(combined_results.keys())
+        placeholders = ', '.join('?' * len(combined_results))
+        sql = 'INSERT INTO LOGGING ({}) VALUES ({})'.format(columns, placeholders)
+        values = [int(x) if isinstance(x, bool) else x for x in combined_results.values()]
+
+        try:
+            self.connection.execute(sql, values)
+            self.connection.commit()
+            print('Insert into LOGGING successful')
+        except Exception as e:
+            print(f'insert into LOGGING unsuccessful {e}')
+
+
+    #Insert final result from a query into the results table
     def insert_into_result(self,result):
 
         QUERY = f'{self.coin_symbol}-{self.investment}'
@@ -165,9 +196,9 @@ class DataCache:
         try:
             self.connection.execute(sql, values)
             self.connection.commit()
-            print('Insert RESULTS successful')
+            print('Insert into RESULTS successful')
         except Exception as e:
-            print(f'insert RESULTS unsuccessful {e}')
+            print(f'insert into RESULTS unsuccessful {e}')
     
     #Insert final result from data collector into the db
     def insert_into_opening_average(self,result):
@@ -185,7 +216,7 @@ class DataCache:
             self.connection.commit()
             print('Insert into OPENING_AVERAGE successful')
         except Exception as e:
-            print(f'insert OPENING_AVERAGE unsuccessful {e}')
+            print(f'insert into OPENING_AVERAGE unsuccessful {e}')
     
 
     #Check if queried table exists
