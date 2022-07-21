@@ -54,98 +54,102 @@ class DataCollector:
         number_of_lambos = round((profit/200000),2)
 
 
-        result_dict.update({'NUMBERCOINS':number_of_coins,'PROFIT':profit,'GROWTHFACTOR':growth_factor,'LAMBOS':number_of_lambos,'INVESTMENT':self.investment,'SYMBOL':self.coin_symbol,'GENERATIONDATE':datetime.now().isoformat()})
+        result_dict.update({'NUMBERCOINS':number_of_coins,'PROFIT':profit,'GROWTHFACTOR':growth_factor,'LAMBOS':number_of_lambos,
+        'INVESTMENT':self.investment,'SYMBOL':self.coin_symbol,'GENERATIONDATE':datetime.now().isoformat()})
 
         return result_dict
 
     #Check if we can get data about the given symbol on our target exchange
     def check_symbol_exists_on_exchange(self):
-        check_symbol = (requests.get(f'https://api.cryptowat.ch/markets/kraken/{self.coin_symbol}usd/price')).json()
+        try:
+            check_symbol = (requests.get(f'https://api.cryptowat.ch/markets/kraken/{self.coin_symbol}usd/price')).json()
 
-        if "error" in check_symbol and check_symbol["error"]=='Instrument not found':
-            return False
-        else:
-            return True
+            if "error" in check_symbol and check_symbol["error"]=='Instrument not found':
+                return False
+            else:
+                return True
+        except Exception as e:
+            print(e)
 
 
     def driver_logic(self):
 
-        dataCache = DataCache(self.coin_symbol,self.investment)
+        try:
 
-        #Irrelevant of what the user gave, we insert the query into the logging table
-        dataCache.insert_into_logging()
+            dataCache = DataCache(self.coin_symbol,self.investment)
 
-        if(self.check_symbol_exists_on_exchange()==False):
-            return "Symbol doesn\'t exist"
-        elif(dataCache.check_if_valid_final_result_exists()):
-            print('A valid cached value exists for this query')
-            cached_result = dataCache.get_valid_final_result()
-            return cached_result
-        else:
-            print('We should query the api')
+            #Irrelevant of what the user gave, we insert the query into the logging table
+            dataCache.insert_into_logging()
 
-            #Converting coin symbol to the lowercase version of itself
-            coin_symbol=self.coin_symbol.lower()
-
-            #Creating timestamps for the time period before the coin was listed and 
-            from_date=int((datetime.now()- timedelta(weeks = 1080)).timestamp())
-            today_date=int((datetime.now()- timedelta(weeks = 12)).timestamp())
-
-            #Here we are checking the datacache first to see if we even need to query the api for the opening prices for the symbol, saving on long term time and api costs
-            if(dataCache.check_if_historical_cache_exists()):
-                print('Opening average cache exists for symbol')
-
-                cached_historical_opening_data = dataCache.get_historical_cache()
-
-                average_start_price = cached_historical_opening_data['AVERAGE']
-
+            if(self.check_symbol_exists_on_exchange()==False):
+                return "Symbol doesn\'t exist"
             else:
-                print('We haven\'t seen this symbol before')
+                print('We should query the api')
 
-                data_raw_start = requests.get(f'https://api.cryptowat.ch/markets/kraken/{coin_symbol}usd/ohlc', params={'after':from_date,'periods': '604800'})
+                #Converting coin symbol to the lowercase version of itself
+                coin_symbol=self.coin_symbol.lower()
 
-                #create pandas dataframe for the price data at the coins inception
-                df_start = self.convert_result_to_pd(data_raw_start)
+                #Creating timestamps for the time period before the coin was listed and 
+                from_date=int((datetime.now()- timedelta(weeks = 1080)).timestamp())
+                today_date=int((datetime.now()- timedelta(weeks = 12)).timestamp())
 
-                #We are only looking at the first month
-                df_start = df_start.head(4)
+                #Here we are checking the datacache first to see if we even need to query the api for the opening prices for the symbol, saving on long term time and api costs
+                if(dataCache.check_if_historical_cache_exists()):
+                    print('Opening average cache exists for symbol')
 
-                #Average price for the starting period
-                average_start_price = df_start["ClosePrice"].mean()
+                    cached_historical_opening_data = dataCache.get_historical_cache()
 
-                print(df_start)
+                    average_start_price = cached_historical_opening_data['AVERAGE']
 
-                opening_average_result = {'SYMBOL':self.coin_symbol,'AVERAGE':average_start_price}
+                else:
+                    print('We haven\'t seen this symbol before')
 
-                dataCache.insert_into_opening_average(opening_average_result)
-            
-            #generating request urls to REST api
-            data_raw_current = requests.get(f'https://api.cryptowat.ch/markets/kraken/{coin_symbol}usd/ohlc', params={'after':today_date,'periods': '604800'})
+                    data_raw_start = requests.get(f'https://api.cryptowat.ch/markets/kraken/{coin_symbol}usd/ohlc', params={'after':from_date,'periods': '604800'})
 
+                    #create pandas dataframe for the price data at the coins inception
+                    df_start = self.convert_result_to_pd(data_raw_start)
 
-            #create pandas dataframe for the price data at the moment
-            df_end = self.convert_result_to_pd(data_raw_current)
+                    #We are only looking at the first month
+                    df_start = df_start.head(4)
 
-            #We only want to look at the last four weeks of current data
-            df_end = df_end.tail(4)
+                    #Average price for the starting period
+                    average_start_price = df_start["ClosePrice"].mean()
 
+                    print(df_start)
 
+                    opening_average_result = {'SYMBOL':self.coin_symbol,'AVERAGE':average_start_price}
 
-            #Average price for the current period
-            average_end_price = df_end["ClosePrice"].mean()
-
-            final_result = self.create_result_dict(average_start_price,average_end_price)
-
-            dataCache.insert_into_result(final_result)
-
-            print(df_end)
-            print(average_end_price)
-
-            print(final_result)
+                    dataCache.insert_into_opening_average(opening_average_result)
+                
+                #generating request urls to REST api
+                data_raw_current = requests.get(f'https://api.cryptowat.ch/markets/kraken/{coin_symbol}usd/ohlc', params={'after':today_date,'periods': '604800'})
 
 
+                #create pandas dataframe for the price data at the moment
+                df_end = self.convert_result_to_pd(data_raw_current)
 
-            return(final_result)
+                #We only want to look at the last four weeks of current data
+                df_end = df_end.tail(4)
+
+
+
+                #Average price for the current period
+                average_end_price = df_end["ClosePrice"].mean()
+
+                final_result = self.create_result_dict(average_start_price,average_end_price)
+
+                dataCache.insert_into_result(final_result)
+
+                print(df_end)
+                print(average_end_price)
+
+                print(final_result)
+
+
+
+                return(final_result)
+        except Exception as e:
+            print(e)
 
 
 

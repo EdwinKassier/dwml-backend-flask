@@ -10,7 +10,7 @@ class DataCache:
         self.coin_symbol = coin_symbol
         self.investment = investment
         self.connection = self.create_connection()
-        self.setup_DB()
+        #self.setup_DB()
 
     #Set up db connection
     def create_connection(self):
@@ -218,21 +218,6 @@ class DataCache:
         except Exception as e:
             print(f'insert into OPENING_AVERAGE unsuccessful {e}')
     
-
-    #Check if queried table exists
-    def check_table_exists(self,table_name):
-        #Create cursor
-        cur = self.connection.cursor()
-
-        #get the count of tables with the given table name
-        cur.execute(f''' SELECT count(name) FROM sqlite_master WHERE type='table' AND name='{table_name}' ''')
-
-        if (cur.fetchone()[0]==1):
-            print(f'The {table_name} Table exists')
-            return True
-        else:
-            print(f'The {table_name} Table does not exist')
-            return False
 
 
 
