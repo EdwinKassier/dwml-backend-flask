@@ -3,7 +3,8 @@ name: Deploy
 on:
   push:
     branches:
-      - production_branch
+      - develop
+      - prod
 
 env:
   PROJECT_ID: ${{ secrets.PROJECT_ID }}
@@ -31,14 +32,8 @@ jobs:
       - run: "echo '${{ secrets.SA_KEY_JSON }}' > credentials.json"
         shell: bash
 
-      # If Tag contains 'production', set production environment
-      - name: Set PRODUCTION env
-        run: |
-          echo "::set-env name=SLACK_BOT_TOKEN::${{ secrets.SLACK_BOT_TOKEN }}"
-
-
       # Setup gcloud CLI
-      - uses: google-github-actions/setup-gcloud@master
+      - uses: google-github-actions/setup-gcloud@v0
         with:
           version: "290.0.1"
           service_account_key: ${{ secrets.SA_KEY_JSON }}
@@ -50,9 +45,7 @@ jobs:
           gcloud builds submit \
             --quiet \
             --tag "gcr.io/$PROJECT_ID/$SERVICE_NAME:$GITHUB_SHA"
-            
-
-      # Deploy image to Cloud Run(This is a manged K8 cluster)
+      # Deploy image to Cloud Run
       - name: Deploy
         run: |-
           gcloud run deploy "$SERVICE_NAME" \
@@ -60,5 +53,4 @@ jobs:
             --region "$RUN_REGION" \
             --image "gcr.io/$PROJECT_ID/$SERVICE_NAME:$GITHUB_SHA" \
             --platform "managed" \
-            --set-env-vars SLACK_BOT_TOKEN=${{ secrets.SLACK_BOT_TOKEN }} \
             --allow-unauthenticated
