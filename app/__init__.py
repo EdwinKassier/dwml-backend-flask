@@ -17,7 +17,6 @@ def create_app():
     # loading env vars from .env file
     load_dotenv()
     APPLICATION_ENV = get_environment()
-    logging.config.dictConfig(app_config[APPLICATION_ENV].LOGGING)
     app = Flask(app_config[APPLICATION_ENV].APP_NAME)
     app.config.from_object(app_config[APPLICATION_ENV])
 
