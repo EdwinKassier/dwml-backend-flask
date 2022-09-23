@@ -16,7 +16,7 @@ logger = LocalProxy(lambda: current_app.logger)
 def before_request_func():
     current_app.logger.name = 'core'
 
-#Preparing for prod release
+#Preparing for prod release cloud run
 @core.route('/process_request', methods=['GET'])
 def test():
     logger.info('app test route hit')
