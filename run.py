@@ -1,6 +1,7 @@
 from app import create_app
 from datetime import datetime
 import json
+import os
 
 app = create_app()
 
@@ -16,4 +17,4 @@ def home():
 
 
 if __name__ == '__main__':
-    app.run()
+    app.run(debug=True, port=int(os.environ.get("PORT", 8080)))
