@@ -65,7 +65,7 @@ class GraphCreator:
 
                 
                 #generating request urls to REST api
-                data_raw_current = requests.get(f'https://api.cryptowat.ch/markets/kraken/{coin_symbol}usd/ohlc', params={'after':today_date,'periods': '604800'})
+                data_raw_current = requests.get(f'https://api.cryptowat.ch/markets/kraken/{coin_symbol}usd/ohlc', params={'after':from_date,'periods': '604800'})
 
 
                 #create pandas dataframe for the price data at the moment
