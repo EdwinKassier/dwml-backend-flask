@@ -7,6 +7,7 @@ from authentication import check_auth
 
 from .tasks import test_task
 from .utils.DataCollector import DataCollector
+from .utils.GraphCreator import GraphCreator
 
 core = Blueprint('core', __name__)
 logger = LocalProxy(lambda: current_app.logger)
@@ -25,8 +26,10 @@ def test():
         investment = int(request.args.get('investment'))
 
         dataCollector = DataCollector(symbol,investment)
+        graphCreator = GraphCreator(symbol)
         result = dataCollector.driver_logic()
-        return json.dumps({"message": result}), 200, {"ContentType": "application/json"}
+        graph_data = graphCreator.driver_logic() 
+        return json.dumps({"message": result,"graph_data":graph_data}), 200, {"ContentType": "application/json"}
     except:
         return json.dumps({"message": 'Server Failure'}), 500, {"ContentType": "application/json"}
 
