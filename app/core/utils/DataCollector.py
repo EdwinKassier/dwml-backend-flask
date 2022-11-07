@@ -117,6 +117,8 @@ class DataCollector:
 
                     print(df_start)
 
+                    print(average_start_price)
+
                     opening_average_result = {'SYMBOL':self.coin_symbol,'AVERAGE':average_start_price}
 
                     dataCache.insert_into_opening_average(opening_average_result)
