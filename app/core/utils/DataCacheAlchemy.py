@@ -1,6 +1,6 @@
 
 import sqlite3
-from datetime import datetime, timedelta
+from datetime import datetime, date
 from dateutil import parser
 
 from sqlalchemy import Table, Column, Integer, Float, String, Time, MetaData, inspect, create_engine
@@ -186,7 +186,7 @@ class DataCacheAlchemy:
 	def insert_into_logging(self):
 
 		combined_results = {'SYMBOL': self.coin_symbol,
-							'INVESTMENT': self.investment, 'GENERATIONDATE': datetime.now()}
+							'INVESTMENT': self.investment, 'GENERATIONDATE': date.today()}
 
 		print(combined_results)
 
