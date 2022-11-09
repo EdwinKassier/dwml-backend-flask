@@ -100,7 +100,7 @@ class DataCollector:
 
                     cached_historical_opening_data = dataCache.get_historical_cache()
 
-                    average_start_price = cached_historical_opening_data['AVERAGE']
+                    average_start_price = cached_historical_opening_data
 
                 else:
                     print('We haven\'t seen this symbol before')

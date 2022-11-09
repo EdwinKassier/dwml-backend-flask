@@ -137,13 +137,19 @@ class DataCacheAlchemy:
 
 		try:
 
-			Session = sessionmaker(bind=self.engine)
-			session = Session()
-			result = session.query(OPENING_AVERAGE).filter(OPENING_AVERAGE.SYMBOL ==
-				f'{self.coin_symbol}').first()
 
+
+			Session = sessionmaker(bind = self.engine)
+			session = Session()
+			
+			result = session.query(OPENING_AVERAGE).filter(OPENING_AVERAGE.SYMBOL==str(self.coin_symbol))
+
+
+			for row in result:
+				print ("Name: ",row.SYMBOL, "Address:",row.AVERAGE)
 
 			print(result)
+
 
 
 			if result != None and result != {}:
@@ -164,18 +170,13 @@ class DataCacheAlchemy:
 
 			Session = sessionmaker(bind=self.engine)
 			session = Session()
-			results = session.query(OPENING_AVERAGE).filter(OPENING_AVERAGE.SYMBOL ==
-				f'{self.coin_symbol}').first()
-
-			print(results)
-
-			for result in results:
-				print(result)
+			results = session.query(OPENING_AVERAGE).filter(OPENING_AVERAGE.SYMBOL==str(self.coin_symbol))
 
 
 			if results != None:
-				print(results)
-				return(results[0])
+				print('Historical cache retrieval')
+				print(f'Historic cache retrieved {results[0].AVERAGE}')
+				return(results[0].AVERAGE)
 			else:
 				return({})
 		except Exception as e:
