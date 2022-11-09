@@ -1,9 +1,9 @@
 
 import sqlite3
-from datetime import datetime, date
+from datetime import datetime, timedelta
 from dateutil import parser
 
-from sqlalchemy import Table, Column, Integer, Float, String, Time, MetaData, inspect, create_engine
+from sqlalchemy import Table, Column, Integer, Float, String, Time,DateTime, MetaData, inspect, create_engine
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
 
@@ -20,7 +20,7 @@ class RESULTS(Base):
 	LAMBOS = Column(Float)
 	INVESTMENT = Column(Float)
 	SYMBOL = Column(String)
-	GENERATIONDATE = Column(Time)
+	GENERATIONDATE = Column(DateTime)
 
 
 class OPENING_AVERAGE(Base):
@@ -36,7 +36,7 @@ class LOGGING(Base):
 	QUERY_ID = Column(Integer, primary_key=True)
 	SYMBOL = Column(String)
 	INVESTMENT = Column(Float)
-	GENERATIONDATE = Column(Time)
+	GENERATIONDATE = Column(DateTime)
 
 
 class DataCacheAlchemy:
@@ -186,7 +186,7 @@ class DataCacheAlchemy:
 	def insert_into_logging(self):
 
 		combined_results = {'SYMBOL': self.coin_symbol,
-							'INVESTMENT': self.investment, 'GENERATIONDATE': date.today()}
+							'INVESTMENT': self.investment, 'GENERATIONDATE': datetime.now()}
 
 		print(combined_results)
 
@@ -207,7 +207,7 @@ class DataCacheAlchemy:
 
 		QUERY_string = f'{self.coin_symbol}-{self.investment}'
 
-		combined_results = {**result, 'QUERY': QUERY_string}
+		combined_results = {**result, 'QUERY': QUERY_string, 'GENERATIONDATE': datetime.now()}
 
 		new_item = RESULTS(QUERY=QUERY_string, NUMBERCOINS=combined_results["NUMBERCOINS"], PROFIT=combined_results["PROFIT"], GROWTHFACTOR=combined_results["GROWTHFACTOR"], LAMBOS=combined_results["LAMBOS"],
 						   INVESTMENT=combined_results["INVESTMENT"], SYMBOL=combined_results["SYMBOL"], GENERATIONDATE=combined_results["GENERATIONDATE"])
