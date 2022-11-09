@@ -8,6 +8,7 @@ from datetime import datetime, timedelta
 
 #Import datacache class as a helper class
 from .DataCache import DataCache
+from .DataCacheAlchemy import DataCacheAlchemy
 
 #Were I to use an api that requires an api key, this is how we would add it
 #headers_dict = {'Accepts': 'application/json','X-CMC_PRO_API_KEY': 'cf1c4cb9-f50d-4d2c-8331-0ff5e2f0cc30',}
@@ -76,7 +77,7 @@ class DataCollector:
 
         try:
 
-            dataCache = DataCache(self.coin_symbol,self.investment)
+            dataCache = DataCacheAlchemy(self.coin_symbol,self.investment)
 
             #Irrelevant of what the user gave, we insert the query into the logging table
             dataCache.insert_into_logging()
