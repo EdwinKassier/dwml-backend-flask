@@ -13,7 +13,8 @@ Base = declarative_base()
 class RESULTS(Base):
 	__tablename__ = 'RESULTS'
 
-	QUERY = Column(String, primary_key=True)
+	id = Column(Integer, primary_key=True)
+	QUERY = Column(String)
 	NUMBERCOINS = Column(Float)
 	PROFIT = Column(Float)
 	GROWTHFACTOR = Column(Float)
@@ -33,7 +34,8 @@ class OPENING_AVERAGE(Base):
 class LOGGING(Base):
 	__tablename__ = 'LOGGING'
 
-	QUERY_ID = Column(Integer, primary_key=True)
+	id = Column(Integer, primary_key=True)
+	QUERY_ID = Column(Integer)
 	SYMBOL = Column(String)
 	INVESTMENT = Column(Float)
 	GENERATIONDATE = Column(DateTime)
@@ -50,7 +52,7 @@ class DataCacheAlchemy:
 	# Set up db connection
 	def create_connection(self):
 		try:
-			engine = create_engine('sqlite:///DudeWheresMyLambo.db', echo = True)
+			engine = create_engine('sqlite:///DudeWheresMyLambo.db')
 
 			print("Database connected to successfully")
 			return engine
@@ -142,17 +144,11 @@ class DataCacheAlchemy:
 			Session = sessionmaker(bind = self.engine)
 			session = Session()
 			
-			result = session.query(OPENING_AVERAGE).filter(OPENING_AVERAGE.SYMBOL==str(self.coin_symbol))
+			result = session.query(OPENING_AVERAGE).filter(OPENING_AVERAGE.SYMBOL==str(self.coin_symbol)).first()
 
 
-			for row in result:
-				print ("Name: ",row.SYMBOL, "Address:",row.AVERAGE)
-
-			print(result)
-
-
-
-			if result != None and result != {}:
+			if result != None:
+				print(result.SYMBOL,result.AVERAGE)
 				print(f'There exists a historical cache for this query {query}')
 				return True
 			else:
@@ -170,13 +166,13 @@ class DataCacheAlchemy:
 
 			Session = sessionmaker(bind=self.engine)
 			session = Session()
-			results = session.query(OPENING_AVERAGE).filter(OPENING_AVERAGE.SYMBOL==str(self.coin_symbol))
+			results = session.query(OPENING_AVERAGE).filter(OPENING_AVERAGE.SYMBOL==str(self.coin_symbol)).first()
 
 
 			if results != None:
 				print('Historical cache retrieval')
-				print(f'Historic cache retrieved {results[0].AVERAGE}')
-				return(results[0].AVERAGE)
+				print(f'Historic cache retrieved {results.AVERAGE}')
+				return(results.AVERAGE)
 			else:
 				return({})
 		except Exception as e:
