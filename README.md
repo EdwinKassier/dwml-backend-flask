@@ -2,7 +2,7 @@
 
 Dude Where's My Lambo answers the question: If I had bought a crypto currency when it first appeared on the public exchange, would I have enough money to buy a lambo if I sold my coins in the last month?
 
-This is the backend for the system
+This is the Flask backend version for the system
 
 ## Requirements
 * Python3
