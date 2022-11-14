@@ -35,7 +35,7 @@ def test_base_route_with_args_invalid_symbol(client):
 
     print(rv.get_data())
     assert rv.status_code == 200
-    assert rv.get_data() == b'''{"message": "Symbol doesn't exist"}'''
+    assert rv.get_data() == b'''{"message": "Symbol doesn't exist", "graph_data": "Symbol doesn't exist"}'''
 
 def test_base_route_malformed_no_symbol(client):
     rv = client.get('/api/v1/project/core/process_request?investment=1000')
@@ -55,12 +55,6 @@ def test_auth_route_without_auth_header(client):
     print(rv.get_data())
     assert rv.status_code == 401
 
-def test_auth_route_with_auth_header(client):
-    rv = client.get('/api/v1/project/core/restricted', headers={'Accepts': 'application/json','x-api-key': '436236939443955C11494D448451F'})
-
-    print(rv.get_data())
-    assert rv.get_data() == b'''{"message": "Successful Auth"}'''
-    assert rv.status_code == 200
 
 
 def test_unknown_route(client):
