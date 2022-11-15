@@ -2,7 +2,7 @@ import logging
 from celery.app.log import TaskFormatter
 from celery.signals import after_setup_task_logger
 
-from app import celery, create_app
+from app import create_app
 
 app = create_app()
 app.app_context().push()
@@ -10,6 +10,7 @@ app.app_context().push()
 
 @after_setup_task_logger.connect
 def setup_task_logger(logger, *args, **kwargs):
+    """Run basic setup for celery logging"""
     sh = logging.handlers.RotatingFileHandler(
         app.config['LOG_CELERY_FILE'],
         maxBytes=app.config['CELERY_LOGGING']['maxBytes'],

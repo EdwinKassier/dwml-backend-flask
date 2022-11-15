@@ -1,1 +1,2 @@
-# add your constants here
+"""A centralized space to house folder wide constants"""
+

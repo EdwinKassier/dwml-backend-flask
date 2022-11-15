@@ -1,5 +1,6 @@
-from os import environ, path
+"""Configuring of the apps data"""
 
+from os import environ, path
 from dotenv import load_dotenv
 
 basedir = path.abspath(path.join(path.dirname(__file__), '..'))

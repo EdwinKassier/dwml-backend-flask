@@ -1,4 +1,4 @@
-"""This is the core of the api, creating an executable and exposing it to the surrounding container"""
+"""This is the main view area of the api, creating the request endpoints"""
 
 import json
 from flask import Blueprint, current_app,request
