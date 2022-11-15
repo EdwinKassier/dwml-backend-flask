@@ -29,7 +29,8 @@ def create_app():
 
     celery.config_from_object(app.config, force=True)
     
-    # We are registering the core folder as a blueprint, this allows us to more easily create other blueprints(ie endpoints) in future if needed, say api/company/support
+    # We are registering the core folder as a blueprint, 
+    # this allows us to more easily create other blueprints(ie endpoints) in future if needed, say api/company/support
     #This allows for easier extension in future
     from .core.views import core as core_blueprint
     app.register_blueprint(
