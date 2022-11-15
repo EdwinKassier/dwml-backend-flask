@@ -1,14 +1,16 @@
 """This module manages the main logic for the api """
 
+import traceback
 from datetime import datetime, timedelta
 import requests
 import pandas as pd
 
 # Import datacache class as a helper class
+# This currently gives a linter error, but it does work as intended
 from app.core.utils.data_cache import DataCache
 from app.core.utils.data_cache_alchemy import DataCacheAlchemy
 
-import traceback
+
 
 # Were I to use an api that requires an api key, this is how we would add it
 # headers_dict =
@@ -174,3 +176,5 @@ class DataCollector:
             return(final_result)
         except Exception as exc:
             print(traceback.format_exc())
+
+            return False

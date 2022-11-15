@@ -1,12 +1,10 @@
+"""This is the core of the api, creating an executable and exposing it to the surrounding container"""
 
+import json
 from flask import Blueprint, current_app,request
 from werkzeug.local import LocalProxy
-import json
-
 from authentication import check_auth
-
 from .tasks import test_task
-
 from .utils import data_collector, graph_creator
 
 core = Blueprint('core', __name__)
@@ -19,7 +17,9 @@ def before_request_func():
 
 #Preparing for prod release cloud run, test
 @core.route('/process_request', methods=['GET'])
-def test():
+def main_request():
+    """Process a request around the main logic of the api"""
+
     logger.info('app test route hit')
     try:
         symbol = str(request.args.get('symbol').strip())
@@ -38,4 +38,6 @@ def test():
 @core.route('/restricted', methods=['GET'])
 @check_auth
 def restricted():
+    """A seperate request to test the auth flow"""
+
     return json.dumps({"message": 'Successful Auth'}), 200, {"ContentType": "application/json"}
