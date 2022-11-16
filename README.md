@@ -36,6 +36,7 @@ The CI/CD pipeline for the api is broken up into three stages
 
 This pipeline can be found in the github workflows folder in the push.yml file
 
+![Alt text](BuildPipeline.png?raw=true "Title")
 
 ## Bringing the code to production
 This code encompasses the backend for a larger system, in the diagram below I have set out the architecture that could be used to create an enterprise ready system that meets all the needs of a high availability and low latency web app.
@@ -44,5 +45,5 @@ I have used GCP for the example, but have chosen the components to be as simplis
 
 This architecture would use github actions as its CI/CD pipeline using the included push.yml file, but could be updated to use something else within the CI/CD ecosystem like Jenkins
 
-![Alt text](DudeWheresMyLambo.Architecture.png?raw=true "Title")
+![Alt text](Architecture.png?raw=true "Title")
 
