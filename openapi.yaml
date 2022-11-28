@@ -4,7 +4,7 @@ info:
   description: This is the Flask variant of the Project Delos backend
   contact:
     email: edwinkassier@gmail.com
-  version: 1.0.11
+  version: 1.0.0
   
 servers:
   - url: https://master-dwml-backend-flask-lqfbwlkw2a-uc.a.run.app/api/v1/project/core/process_request
