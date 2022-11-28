@@ -7,8 +7,6 @@ info:
   version: 1.0.0
   
 servers:
-  - url: https://master-dwml-backend-flask-lqfbwlkw2a-uc.a.run.app/api/v1/project/core/process_request
-    description: e.g. Main (production) server
   - url: https://localhost/api/v1/project/core/process_request
     description: e.g. Internal staging server for testing
 
