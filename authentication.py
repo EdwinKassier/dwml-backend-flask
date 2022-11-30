@@ -20,11 +20,11 @@ from flask import abort, current_app, request
 def check_auth(view_function):
 	"""This is used in the core app as part of a zero trust model to ensure users are authorized
 	This would be part of a larger system where we also ensure
-	only valid users can query the api in the first place (part of our cloud infrastructure)"""
+	only valid sources of queries can query the api in the first place (part of our cloud infrastructure)"""
 	@wraps(view_function)
 	#This decorator allows us to globally call the function to check auth regardless of source
 	def decorated_function(*args, **kwargs):
-		"""checks for verified request through firebase"""
+		"""checks for verified request using firebase auth, this also gracefully handles anonymous user in the case of front ends where the user can't login"""
 		try:
 			print("checking authorization...")
 			headers = request.headers
