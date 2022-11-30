@@ -24,6 +24,7 @@ flask-testing = "*"
 sqlalchemy = "*"
 firebase-admin = "*"
 firebase = "*"
+git-filter-repo = "*"
 
 [requires]
 python_version = "3.10"
