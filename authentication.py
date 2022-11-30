@@ -6,11 +6,14 @@ from firebase_admin import credentials
 from firebase_admin import firestore
 from firebase_admin import auth
 
+import os
+
 import traceback
 
 # Use a the given service account
-cred = credentials.Certificate('credentials.json')
-firebase_admin.initialize_app(cred)
+if os.path.exists('token.json'):
+	cred = credentials.Certificate('credentials.json')
+	firebase_admin.initialize_app(cred)
 
 from flask import abort, current_app, request
 
