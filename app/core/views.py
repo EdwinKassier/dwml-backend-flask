@@ -4,7 +4,9 @@ import json
 from flask import Blueprint, current_app,request
 from werkzeug.local import LocalProxy
 from authentication import check_auth
+import traceback
 from .utils import data_collector, graph_creator
+
 
 core = Blueprint('core', __name__)
 logger = LocalProxy(lambda: current_app.logger)

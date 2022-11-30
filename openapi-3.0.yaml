@@ -11,8 +11,7 @@ servers:
     description: e.g. Internal staging server for testing
 
 
-
-    
+  
     
 paths:
 
