@@ -11,7 +11,7 @@ import os
 import traceback
 
 # Use a the given service account
-if os.path.exists('token.json'):
+if os.path.exists('credentials.json'):
 	cred = credentials.Certificate('credentials.json')
 	firebase_admin.initialize_app(cred)
 
