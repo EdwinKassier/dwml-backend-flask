@@ -1,3 +1,12 @@
+![alt text](https://upload.wikimedia.org/wikipedia/commons/thumb/3/3c/Flask_logo.svg/1280px-Flask_logo.svg.png "Flask Logo")
+
+
+### *Edwin Kassier*
+
+
+---
+
+
 ## Introduction
 
 Flask is a micro web framework built on top of Python. In terms of complexity; it sits somewhere between Django on the more complex end and Fast api on the simpler side. Flask is a good jack of all trades in the web framework space as it has the ability to scale up in complexity into something you might see in a big tech corporate, but you can also achieve great results by keeping it at its bare minimum.
@@ -7,7 +16,7 @@ Flask is a micro web framework built on top of Python. In terms of complexity; i
 
 At its lowest level, a Flask instance is made up of routes. A route describes an address that the outside world can use when speaking to the api to perform some action.
 
-Here is an example of a route using flasks route decorator  ```@app.route('/home', methods=['GET'])```
+Here is an example of a route using flasks route decorator:  ```@app.route('/home', methods=['GET'])```
 
 Using this route as an example we are expecting a valid response from the api when querying https://ourapi/home using a get command
 
@@ -34,16 +43,35 @@ Now when querying the ```/home ``` route in our new blueprint we can use ```/api
 
 Congratulations, you now have a partitioned api, you can build it out as much as you would like from here.
 
+## Understanding the structure of a partitioned flask api
+
+First things first, we need to setout the entry point: how do we run the api?
+
+The entry point for the api can be found in the ```run.py``` file, therefore you will be able to run the api by executing `python run.py`
+
+In the run file the most important line to take note of is this one: `app = create_app()`
+
+Here we are creating an instance of flask and then registering all relevant blueprints on top of it. If you don't know what blueprints are, you can look at the "Designing Flask for Scale" section. Once we have a registered instance we can set out routes in the run.py file itself if we need to have basic utilities, such as a check for the front end to know that the api is running before sending queries. If your needs are related to a user related task, rather make a new partition.
+
+All business logic for the api itself is setup in the app folder, you will find the `create_app()` method from above in the `__init__.py` file which will pull registered blueprint logic from the other folders in that environment. Here for example, we are pulling in a blueprint and its logic from the `core` folder.
+
+Inside the `core` folder you will see a few files that will be useful; most important of all is the `views.py` file. This file determines the routes that your blueprint is exposing, without this your blueprint will be invisible to the world.
+
+The `tasks.py` file will hold all celery tasks that your blueprint may need.
+
+The `enums.py` file is a storage file for the various global enums you may need in the course of handling requests
+
+the `constants.py` file is a storage file for the various global constants you may need in the course of handling requests
 
 ## FAQs
 
-### Why are the routes within a views file?
+### Why are the routes within the views file?
 
 This is a holdover from the fact that the routes could return HTML templates with the relevant data injected into it, returning a "view" for the frontend to use
 
 ### What is Celery, and why is it used in Flask?
 
-Celery is an asynchronous background task queue. Why it is important in something like an api is that one of the main SLIs (Service Level Indicators) for an api is latency. If you are trying to perform an action in your request, sending an email for example, you will be blocking the api from sending a response until that action completes. To solve for this you can hand the task off to celery to run as a background task so that it can continue to run its action after a response has been sent, thus decreasing the latency. However, a caveat here, background tasks are great for handling longer running tasks that can run in the background after a response has been sent, but sometimes you will need to sent a confirmation that the task ran successfully, for these kinds of events you will need to use a synchronous (response blocking) action instead.
+Celery is an asynchronous background task queue. Why it is important in something like an api is that one of the main SLIs (Service Level Indicators) for an api is latency. If you are trying to perform an action in your request, sending an email for example, you will be blocking the api from sending a response until that action completes. To solve for this you can hand the task off to celery to run as a background task so that it can continue to run its action after a response has been sent, thus decreasing the latency. However, a caveat here, background tasks are great for handling longer running tasks that can run in the background after a response has been sent, but sometimes you will need to send a confirmation to the user that the task ran successfully in your response, for these kinds of events you will need to use a synchronous (response blocking) action instead.
 
 ### Why does the blueprint have an empty init file
 
