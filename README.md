@@ -21,7 +21,9 @@ You will need two terminals pointed to the frontend and backend directories to s
 2. Run this command to start the backend server: ```[python run.py]``` (You have to run this command while you are sourced into the virtual environment)
 
 ## Understanding the API
-The structure of the api (including parameters required, expected responses etc.) has been set out in the openapi.yaml file, this adheres to the OpenAPI 3.0 structure, and is consistent with tools like Swagger
+The structure of the api (including parameters required, expected responses etc.) has been set out in the openapi.yaml file, this adheres to the OpenAPI 3.0 structure, and is consistent with tools like Swagger.
+
+For further learnings you can look at the Flask_Tutorial.md file
 
 ## Test the application
 All the tests for this api are functional tests using pytest
