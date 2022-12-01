@@ -14,20 +14,20 @@ Flask is a micro web framework built on top of Python. In terms of complexity; i
 
 ## A high level view of flask
 
-At its lowest level, a Flask instance is made up of routes. A route describes an address that the outside world can use when speaking to the api to perform some action.
+At its lowest level, a Flask instance is made up of routes. A route describes an address that the outside world can use when communicating with the api to perform some action.
 
 Here is an example of a route using flasks route decorator:  ```@app.route('/home', methods=['GET'])```
 
 Using this route as an example we are expecting a valid response from the api when querying https://ourapi/home using a get command
 
-The response from these routes can vary, it could be a backend response in the form of a JSON, maybe telling the front end which trades this current users has made in the past, or it could be a template response, that being the full HTML needed to render a new page. The response can vary, but the route will stay the same.
+The response from these routes can vary, it could be a backend response in the form of a JSON, maybe telling the front end which trades this current users has made in the past, or it could be a template response, being the full HTML needed to render a new page. The response can vary, but the route will stay the same.
 
 
 ## Designing Flask for scale
 
 If you aren't building a microservice server to handle a handful of tasks, as in what you can count on two hands, you will need to implement some method to break up the routes into logical partitions. 
 
-Breaking up the routes like this helps you as a developer to create a system that is more easily maintained, but more importantly, a system that is easy to understand. For example; keeping all of the routes related to speaking to third party apis is a good design decision as you can ensure you keep all the code necessary to complete those kinds of tasks in one place and you wont be repeating yourself in other places.
+Breaking up the routes like this helps you as a developer to create a system that is more easily maintained, but more importantly, a system that is easy to understand. For example; keeping all of the routes related to communicating with third party apis is a good design decision as you can ensure you keep all the code necessary to complete those kinds of tasks in one place and you wont be repeating yourself in other places.
 
 How then do we achieve this in Flask? The answer here is the blueprint design pattern. At its core the blueprint design pattern creates a foundational instance of flask and then allows other instances of flask that could have otherwise been flask services in their own right to be appended on top of that instance in what are called, you guessed it, blueprints.
 
