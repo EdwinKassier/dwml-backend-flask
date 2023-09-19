@@ -12,7 +12,7 @@ from .utils import data_collector, graph_creator
 @strawberry.type
 class ProcessRequestResult:
     message: str
-    graph_data: str 
+    graph_data: str
 
 # Define a GraphQL schema
 @strawberry.type
