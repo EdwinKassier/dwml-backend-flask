@@ -9,6 +9,10 @@ from flask import Flask
 from flask_cors import CORS
 
 from .config import config as app_config
+from strawberry.flask.views import GraphQLView
+
+from .core.views import core as core_blueprint
+from .core.schema import schema
 
 
 celery = Celery(__name__)
@@ -37,6 +41,11 @@ def create_app():
         core_blueprint,
         url_prefix='/api/v1/project/core'
     )
+
+    app.add_url_rule(
+    "/graphql",
+    view_func=GraphQLView.as_view("graphql_view", schema=schema),
+)
 
     return app
 
