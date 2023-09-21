@@ -29,7 +29,7 @@ def create_app():
     app.config.from_object(app_config[APPLICATION_ENV])
 
     #This step is critical for allowing testing while in a local environment
-    CORS(app, resources={r'/api/*': {'origins': '*'}})
+    CORS(app, resources={r"/*": {'origins': '*'}})
 
     celery.config_from_object(app.config, force=True)
     

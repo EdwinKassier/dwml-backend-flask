@@ -74,7 +74,7 @@ jobs:
       - run: "echo '${{ secrets.SA_KEY_JSON }}' > credentials.json"
         shell: bash
 
-       # Setup gcloud CLI
+      # Setup gcloud CLI
       - id: 'auth'
         uses: 'google-github-actions/auth@v1'
         with:
