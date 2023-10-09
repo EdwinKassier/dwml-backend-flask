@@ -30,21 +30,25 @@ class DataCollector:
         convert this into a pd dataframe"""
 
         # Convert raw response to a json representation
-        data = raw.json()
+        ohlc_data = raw.json()['result']
 
-        # Create a pd dataframe from the json result
-        data_frame = pd.DataFrame(data['result']['604800'], columns=[
-            'CloseTime', 'OpenPrice', 'HighPrice',
-            'LowPrice', 'ClosePrice', 'Volume', 'NA'])
+        value = list(ohlc_data.values())[0]
 
-        # Make a date out of CloseTime
-        data_frame['CloseTime'] = pd.to_datetime(
-            data_frame['CloseTime'], unit='s')
+        df = pd.DataFrame(value, columns=['timestamp', 'open', 'high', 'low', 'close', 'vwap', 'volume', 'count'])
+
+        df = df.rename({'close': 'ClosePrice'}, axis='columns')
+
+        df["ClosePrice"] = pd.to_numeric(df["ClosePrice"])
+
+        df['CloseTime'] = pd.to_datetime(
+                    df['timestamp'], unit='s')
+
+        df['CloseTime'] = df['CloseTime'].astype(str)
 
         # make CloseTime Index of the data_frame
-        data_frame.set_index('CloseTime', inplace=True)
+        df.set_index('CloseTime', inplace=True)
 
-        return data_frame
+        return df
 
     def create_result_dict(self, average_start_price, average_end_price):
         """Create final result dict to be passed to the front end"""
@@ -79,7 +83,7 @@ class DataCollector:
         """Check if we can get data about the given symbol on our target exchange"""
         try:
             check_symbol = (requests.get(
-                f'https://api.cryptowat.ch/markets/kraken/{self.coin_symbol}usd/price', timeout=10)).json()
+                f'https://api.kraken.com/0/public/OHLC?pair={self.coin_symbol}USD&interval=21600&since=1548111600')).json()
 
             if "error" in check_symbol and check_symbol["error"] == 'Instrument not found':
                 return False
@@ -129,8 +133,7 @@ class DataCollector:
                 print('We haven\'t seen this symbol before')
 
                 data_raw_start = requests.get(
-                    f'https://api.cryptowat.ch/markets/kraken/{coin_symbol}usd/ohlc',
-                    params={'after': from_date, 'periods': '604800'}, timeout=10)
+                    f'https://api.kraken.com/0/public/OHLC?pair={self.coin_symbol}USD&interval=21600&since=1548111600')
 
                 # create pandas dataframe for the price data at the coins inception
                 df_start = self.convert_result_to_pd(data_raw_start)
@@ -151,8 +154,7 @@ class DataCollector:
 
             # generating request urls to REST api
             data_raw_current = requests.get(
-                f'https://api.cryptowat.ch/markets/kraken/{coin_symbol}usd/ohlc',
-                params={'after': today_date, 'periods': '604800'}, timeout=10)
+                f'https://api.kraken.com/0/public/OHLC?pair={self.coin_symbol}USD&interval=21600&since=1548111600')
 
             # create pandas dataframe for the price data at the moment
             df_end = self.convert_result_to_pd(data_raw_current)

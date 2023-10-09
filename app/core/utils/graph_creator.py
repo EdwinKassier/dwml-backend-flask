@@ -21,27 +21,28 @@ class GraphCreator:
         convert this into a pd dataframe"""
 
         # Convert raw response to a json representation
-        data = raw.json()
+        ohlc_data = raw.json()['result']
 
-        # Create a pd dataframe from the json result
-        data_frame = pd.DataFrame(data['result']['604800'], columns=[
-            'CloseTime', 'OpenPrice', 'HighPrice',
-            'LowPrice', 'ClosePrice', 'Volume', 'NA'])
+        value = list(ohlc_data.values())[0]
 
-        # Make a date out of CloseTime
-        data_frame['CloseTime'] = pd.to_datetime(
-            data_frame['CloseTime'], unit='s')
+        df = pd.DataFrame(value, columns=['timestamp', 'open', 'high', 'low', 'close', 'vwap', 'volume', 'count'])
 
-        data_frame['CloseTime'] = data_frame['CloseTime'].astype(str)
+        df = df.rename({'close': 'ClosePrice'}, axis='columns')
 
-        return data_frame
+        df["ClosePrice"] = pd.to_numeric(df["ClosePrice"])
+
+        df['CloseTime'] = pd.to_datetime(
+                    df['timestamp'], unit='s')
+
+        df['CloseTime'] = df['CloseTime'].astype(str)
+
+        return df
 
     def check_symbol_exists_on_exchange(self):
         """Check if we can get data about the given symbol on our target exchange"""
         try:
             check_symbol = (requests.get(
-                f'https://api.cryptowat.ch/markets/kraken/{self.coin_symbol}usd/price',
-                timeout=10)).json()
+                f'https://api.kraken.com/0/public/OHLC?pair={self.coin_symbol}USD&interval=21600&since=1548111600')).json()
 
             if "error" in check_symbol and check_symbol["error"] == 'Instrument not found':
                 return False
@@ -60,25 +61,21 @@ class GraphCreator:
                 return "Symbol doesn\'t exist"
             print('We should query the api')
 
-            # Converting coin symbol to the lowercase version of itself
-            coin_symbol = self.coin_symbol.lower()
-
             # Creating timestamps for the time period before the coin was listed and
             from_date = int(
                 (datetime.now() - timedelta(weeks=1080)).timestamp())
-            #today_date = int( (datetime.now() - timedelta(weeks=12)).timestamp())
+            # today_date = int( (datetime.now() - timedelta(weeks=12)).timestamp())
 
             # generating request urls to REST api
             data_raw_current = requests.get(
-                f'https://api.cryptowat.ch/markets/kraken/{coin_symbol}usd/ohlc',
-                params={'after': from_date, 'periods': '604800'}, timeout=10)
+                f'https://api.kraken.com/0/public/OHLC?pair={self.coin_symbol}USD&interval=21600&since=1548111600')
 
             # create pandas dataframe for the price data at the moment
             data_frame = self.convert_result_to_pd(data_raw_current)
 
             # Remove two columns name is 'C' and 'D'
-            data_frame = data_frame.drop(['OpenPrice', 'HighPrice',
-                                          'LowPrice', 'Volume', 'NA'], axis=1)
+            data_frame = data_frame.drop(['open', 'high', 'timestamp',
+                                          'low', 'volume', 'vwap','count'], axis=1)
 
             # Rename columns for frontend
             data_frame = data_frame.rename(
