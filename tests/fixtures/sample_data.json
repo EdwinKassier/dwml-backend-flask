@@ -1,0 +1,45 @@
+{
+  "crypto_data": {
+    "BTC": {
+      "symbol": "BTC",
+      "investment": 1000,
+      "expected_profit": 500,
+      "expected_coins": 0.1,
+      "expected_lambos": 2.5
+    },
+    "ETH": {
+      "symbol": "ETH", 
+      "investment": 500,
+      "expected_profit": 250,
+      "expected_coins": 2.0,
+      "expected_lambos": 1.25
+    }
+  },
+  "graph_data": [
+    {"x": "2023-01-01", "y": 1000},
+    {"x": "2023-01-02", "y": 1050},
+    {"x": "2023-01-03", "y": 1100},
+    {"x": "2023-01-04", "y": 1080},
+    {"x": "2023-01-05", "y": 1150}
+  ],
+  "api_responses": {
+    "success": {
+      "message": {
+        "SYMBOL": "BTC",
+        "INVESTMENT": 1000,
+        "NUMBERCOINS": 0.1,
+        "PROFIT": 500,
+        "GROWTHFACTOR": 1.5,
+        "LAMBOS": 2.5,
+        "GENERATIONDATE": "2023-01-01"
+      },
+      "graph_data": [
+        {"x": "2023-01-01", "y": 1000},
+        {"x": "2023-01-02", "y": 1050}
+      ]
+    },
+    "error": {
+      "message": "Server Failure"
+    }
+  }
+}

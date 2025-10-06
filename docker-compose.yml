@@ -1,9 +1,44 @@
-version: '3'
+version: '3.8'
+
 services:
+  # PRESERVE: Main Flask application
   flask-app:
     build:
       context: .
       dockerfile: Dockerfile
     restart: "always"
+    ports:
+      - "8080:8080"  # PRESERVE: Same port
+    environment:
+      - FLASK_ENV=production
+      - DATABASE_URL=sqlite:///DudeWheresMyLambo.db
+      - SECRET_KEY=your-secret-key-here
+      - CORS_ORIGINS=https://yourdomain.com
+      - RATE_LIMIT_ENABLED=True
+      - ENABLE_MONITORING=True
     volumes:
-      - .:/app  # Mount the current directory to /app in the container
+      - ./data:/app/data  # PRESERVE: Mount data directory
+      - ./log:/app/log    # PRESERVE: Mount log directory
+    # SQLite only - no external dependencies
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8080/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  # SQLite only - no external database services needed
+
+  # NEW: Nginx reverse proxy for production (optional)
+  # nginx:
+  #   image: nginx:alpine
+  #   restart: "always"
+  #   ports:
+  #     - "80:80"
+  #     - "443:443"
+  #   volumes:
+  #     - ./nginx.conf:/etc/nginx/nginx.conf
+  #     - ./ssl:/etc/nginx/ssl
+  #   depends_on:
+  #     - flask-app
+
+# SQLite only - no external volumes needed

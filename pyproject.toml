@@ -1,0 +1,137 @@
+[build-system]
+requires = ["setuptools>=61.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "dwml-backend"
+version = "1.0.0"
+description = "DudeWheresMyLambo Backend API - Cryptocurrency Investment Analysis"
+authors = [
+    {name = "Edwin Kassier", email = "edwinkassier@gmail.com"}
+]
+license = {text = "MIT"}
+readme = "README.md"
+requires-python = ">=3.10"
+keywords = ["flask", "cryptocurrency", "api", "investment", "analysis"]
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Intended Audience :: Developers",
+    "License :: OSI Approved :: MIT License",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+]
+
+dependencies = [
+    "flask>=2.2.2,<4.0.0",
+    "sqlalchemy>=1.4.44,<3.0.0",
+    # "celery>=5.2.7,<6.0.0",  # Disabled - using SQLite only
+    # "redis>=4.3.5,<5.0.0",   # Disabled - using SQLite only
+    "flask-cors>=3.0.10,<4.0.0",
+    "python-dotenv>=0.21.0,<2.0.0",
+    "marshmallow>=3.19.0,<4.0.0",
+    "webargs>=8.2.0,<9.0.0",
+    "requests>=2.28.1,<3.0.0",
+    "pandas>=1.5.2,<3.0.0",
+    "firebase-admin>=6.0.1,<7.0.0",
+    "strawberry-graphql>=0.208.3,<1.0.0",
+    "grpcio>=1.51.1,<2.0.0",
+    "protobuf>=4.21.9,<5.0.0",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=7.2.0,<8.0.0",
+    "pytest-flask>=1.2.0,<2.0.0",
+    "pytest-cov>=4.0.0,<5.0.0",
+    "black>=23.0.0,<24.0.0",
+    "flake8>=6.0.0,<7.0.0",
+    "mypy>=1.0.0,<2.0.0",
+    "bandit>=1.7.0,<2.0.0",
+    "safety>=2.0.0,<3.0.0",
+    "isort>=5.12.0,<6.0.0",
+    "autopep8>=2.0.0,<3.0.0",
+]
+
+prod = [
+    "gunicorn>=20.1.0,<21.0.0",
+    "flask-talisman>=1.1.0,<2.0.0",
+    "flask-limiter>=3.0.0,<4.0.0",
+    "psycopg2-binary>=2.9.0,<3.0.0",
+    "prometheus-client>=0.16.0,<1.0.0",
+]
+
+[project.urls]
+Homepage = "https://github.com/edwinkassier/dwml-backend-flask"
+Documentation = "https://github.com/edwinkassier/dwml-backend-flask#readme"
+Repository = "https://github.com/edwinkassier/dwml-backend-flask.git"
+"Bug Tracker" = "https://github.com/edwinkassier/dwml-backend-flask/issues"
+
+[tool.black]
+line-length = 88
+target-version = ['py310', 'py311', 'py312']
+include = '\.pyi?$'
+extend-exclude = '''
+/(
+  # directories
+  \.eggs
+  | \.git
+  | \.hg
+  | \.mypy_cache
+  | \.tox
+  | \.venv
+  | build
+  | dist
+)/
+'''
+
+[tool.isort]
+profile = "black"
+line_length = 88
+multi_line_output = 3
+include_trailing_comma = true
+force_grid_wrap = 0
+use_parentheses = true
+ensure_newline_before_comments = true
+
+[tool.mypy]
+python_version = "3.10"
+warn_return_any = true
+warn_unused_configs = true
+disallow_untyped_defs = true
+disallow_incomplete_defs = true
+check_untyped_defs = true
+disallow_untyped_decorators = true
+no_implicit_optional = true
+warn_redundant_casts = true
+warn_unused_ignores = true
+warn_no_return = true
+warn_unreachable = true
+strict_equality = true
+
+[tool.bandit]
+exclude_dirs = ["tests", "venv", ".venv"]
+skips = ["B101", "B601"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+python_files = ["test_*.py", "*_test.py"]
+python_classes = ["Test*"]
+python_functions = ["test_*"]
+addopts = [
+    "--strict-markers",
+    "--strict-config",
+    "--verbose",
+    "--tb=short",
+    "--cov=app",
+    "--cov-report=term-missing",
+    "--cov-report=html",
+    "--cov-report=xml",
+]
+markers = [
+    "unit: Unit tests",
+    "integration: Integration tests",
+    "e2e: End-to-end tests",
+    "slow: Slow tests",
+]
