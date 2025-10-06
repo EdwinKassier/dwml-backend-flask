@@ -3,6 +3,7 @@
 # Conditional imports to avoid issues when dependencies are not installed
 try:
     from flask_sqlalchemy import SQLAlchemy
+
     SQLALCHEMY_AVAILABLE = True
 except ImportError:
     SQLALCHEMY_AVAILABLE = False
@@ -10,6 +11,7 @@ except ImportError:
 
 try:
     from flask_cors import CORS
+
     CORS_AVAILABLE = True
 except ImportError:
     CORS_AVAILABLE = False
@@ -38,12 +40,12 @@ def init_extensions(app):
     """Initialize Flask extensions with the app."""
     if SQLALCHEMY_AVAILABLE and db:
         db.init_app(app)
-    
+
     if CORS_AVAILABLE and cors:
         cors.init_app(app)
-    
+
     # Celery disabled - no Redis
     # if CELERY_AVAILABLE and celery:
     #     celery.init_app(app)
-    
+
     return app

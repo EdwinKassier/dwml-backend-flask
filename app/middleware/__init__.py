@@ -4,4 +4,4 @@ from .security import SecurityMiddleware
 from .rate_limit import RateLimitMiddleware
 from .cors import CORSConfig
 
-__all__ = ['SecurityMiddleware', 'RateLimitMiddleware', 'CORSConfig']
+__all__ = ["SecurityMiddleware", "RateLimitMiddleware", "CORSConfig"]

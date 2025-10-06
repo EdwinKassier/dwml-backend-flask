@@ -2,17 +2,19 @@ import asyncio
 
 import strawberry
 import json
-from flask import Blueprint, current_app,request
+from flask import Blueprint, current_app, request
 from werkzeug.local import LocalProxy
 from authentication import check_auth
 import traceback
 from .utils import data_collector, graph_creator
 import typing
 
+
 @strawberry.type
 class ProcessRequestResult:
     message: str
     graph_data: str
+
 
 # Define a GraphQL schema
 @strawberry.type
@@ -28,8 +30,6 @@ class Query:
         except Exception as exc:
             print(exc)
             return ProcessRequestResult(message="Symbol doesn't exist", graph_data=[])
-
-
 
 
 schema = strawberry.Schema(query=Query)

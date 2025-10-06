@@ -1,4 +1,4 @@
-"""This module manages the main logic for the api """
+"""This module manages the main logic for the api"""
 
 import traceback
 from datetime import datetime, timedelta
@@ -11,11 +11,10 @@ from app.core.utils.data_cache import DataCache
 from app.core.utils.data_cache_alchemy import DataCacheAlchemy
 
 
-
 # Were I to use an api that requires an api key, this is how we would add it
 # headers_dict =
 # {'Accepts': 'application/json','X-CMC_PRO_API_KEY': 'cf1c4cb9-f50d-4d2c-8331-0ff5e2f0cc30',}
-#r = requests.get('<MY_URI>', headers=headers_dict)
+# r = requests.get('<MY_URI>', headers=headers_dict)
 
 
 class DataCollector:
@@ -30,23 +29,34 @@ class DataCollector:
         convert this into a pd dataframe"""
 
         # Convert raw response to a json representation
-        ohlc_data = raw.json()['result']
+        ohlc_data = raw.json()["result"]
 
         value = list(ohlc_data.values())[0]
 
-        df = pd.DataFrame(value, columns=['timestamp', 'open', 'high', 'low', 'close', 'vwap', 'volume', 'count'])
+        df = pd.DataFrame(
+            value,
+            columns=[
+                "timestamp",
+                "open",
+                "high",
+                "low",
+                "close",
+                "vwap",
+                "volume",
+                "count",
+            ],
+        )
 
-        df = df.rename({'close': 'ClosePrice'}, axis='columns')
+        df = df.rename({"close": "ClosePrice"}, axis="columns")
 
         df["ClosePrice"] = pd.to_numeric(df["ClosePrice"])
 
-        df['CloseTime'] = pd.to_datetime(
-                    df['timestamp'], unit='s')
+        df["CloseTime"] = pd.to_datetime(df["timestamp"], unit="s")
 
-        df['CloseTime'] = df['CloseTime'].astype(str)
+        df["CloseTime"] = df["CloseTime"].astype(str)
 
         # make CloseTime Index of the data_frame
-        df.set_index('CloseTime', inplace=True)
+        df.set_index("CloseTime", inplace=True)
 
         return df
 
@@ -55,37 +65,48 @@ class DataCollector:
         # init result dict - will become a json in the REST response
         result_dict = {}
 
-        print(
-            f'Create result dict average start price : {average_start_price}')
+        print(f"Create result dict average start price : {average_start_price}")
 
         # Number of coins purchased at the beginning
-        number_of_coins = self.investment/average_start_price
+        number_of_coins = self.investment / average_start_price
 
         # What is our profit if we sold at the average price of the last month
-        profit = round(
-            ((number_of_coins*average_end_price)-self.investment), 2)
+        profit = round(((number_of_coins * average_end_price) - self.investment), 2)
 
         # Growth factor of the initial investment
-        growth_factor = round((profit/self.investment), 2)
+        growth_factor = round((profit / self.investment), 2)
 
         # number of lambos user could buy using this profit
         #  - assuming the price of an average lamborghini is $200000
-        number_of_lambos = round((profit/200000), 2)
+        number_of_lambos = round((profit / 200000), 2)
 
-        result_dict.update({'NUMBERCOINS': number_of_coins, 'PROFIT': profit,
-                            'GROWTHFACTOR': growth_factor, 'LAMBOS': number_of_lambos,
-                            'INVESTMENT': self.investment, 'SYMBOL': self.coin_symbol,
-                            'GENERATIONDATE': datetime.now().isoformat()})
+        result_dict.update(
+            {
+                "NUMBERCOINS": number_of_coins,
+                "PROFIT": profit,
+                "GROWTHFACTOR": growth_factor,
+                "LAMBOS": number_of_lambos,
+                "INVESTMENT": self.investment,
+                "SYMBOL": self.coin_symbol,
+                "GENERATIONDATE": datetime.now().isoformat(),
+            }
+        )
 
         return result_dict
 
     def check_symbol_exists_on_exchange(self):
         """Check if we can get data about the given symbol on our target exchange"""
         try:
-            check_symbol = (requests.get(
-                f'https://api.kraken.com/0/public/OHLC?pair={self.coin_symbol}USD&interval=21600&since=1548111600')).json()
+            check_symbol = (
+                requests.get(
+                    f"https://api.kraken.com/0/public/OHLC?pair={self.coin_symbol}USD&interval=21600&since=1548111600"
+                )
+            ).json()
 
-            if "error" in check_symbol and check_symbol["error"] == 'Instrument not found':
+            if (
+                "error" in check_symbol
+                and check_symbol["error"] == "Instrument not found"
+            ):
                 return False
 
             return True
@@ -105,23 +126,21 @@ class DataCollector:
             dataCache.insert_into_logging()
 
             if self.check_symbol_exists_on_exchange() is False:
-                return "Symbol doesn\'t exist"
+                return "Symbol doesn't exist"
 
-            print('We should query the api')
+            print("We should query the api")
 
             # Converting coin symbol to the lowercase version of itself
             coin_symbol = self.coin_symbol.lower()
 
             # Creating timestamps for the time period before the coin was listed and
-            from_date = int(
-                (datetime.now() - timedelta(weeks=1080)).timestamp())
-            today_date = int(
-                (datetime.now() - timedelta(weeks=12)).timestamp())
+            from_date = int((datetime.now() - timedelta(weeks=1080)).timestamp())
+            today_date = int((datetime.now() - timedelta(weeks=12)).timestamp())
 
             # Here we are checking the datacache first to see if we even need to query the api
             # for the opening prices for the symbol, saving on long term time and api costs
             if dataCache.check_if_historical_cache_exists():
-                print('Opening average cache exists for symbol')
+                print("Opening average cache exists for symbol")
 
                 cached_historical_opening_data = dataCache.get_historical_cache()
 
@@ -130,10 +149,11 @@ class DataCollector:
                 average_start_price = cached_historical_opening_data
 
             else:
-                print('We haven\'t seen this symbol before')
+                print("We haven't seen this symbol before")
 
                 data_raw_start = requests.get(
-                    f'https://api.kraken.com/0/public/OHLC?pair={self.coin_symbol}USD&interval=21600&since=1548111600')
+                    f"https://api.kraken.com/0/public/OHLC?pair={self.coin_symbol}USD&interval=21600&since=1548111600"
+                )
 
                 # create pandas dataframe for the price data at the coins inception
                 df_start = self.convert_result_to_pd(data_raw_start)
@@ -147,14 +167,16 @@ class DataCollector:
                 print(df_start)
 
                 opening_average_result = {
-                    'SYMBOL': self.coin_symbol, 'AVERAGE': average_start_price}
+                    "SYMBOL": self.coin_symbol,
+                    "AVERAGE": average_start_price,
+                }
 
-                dataCache.insert_into_opening_average(
-                    opening_average_result)
+                dataCache.insert_into_opening_average(opening_average_result)
 
             # generating request urls to REST api
             data_raw_current = requests.get(
-                f'https://api.kraken.com/0/public/OHLC?pair={self.coin_symbol}USD&interval=21600&since=1548111600')
+                f"https://api.kraken.com/0/public/OHLC?pair={self.coin_symbol}USD&interval=21600&since=1548111600"
+            )
 
             # create pandas dataframe for the price data at the moment
             df_end = self.convert_result_to_pd(data_raw_current)
@@ -166,7 +188,8 @@ class DataCollector:
             average_end_price = df_end["ClosePrice"].mean()
 
             final_result = self.create_result_dict(
-                average_start_price, average_end_price)
+                average_start_price, average_end_price
+            )
 
             dataCache.insert_into_result(final_result)
 
@@ -175,7 +198,7 @@ class DataCollector:
 
             print(final_result)
 
-            return(final_result)
+            return final_result
         except Exception as exc:
             print(traceback.format_exc())
 

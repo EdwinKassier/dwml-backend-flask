@@ -20,11 +20,11 @@ env:
   ACTIONS_ALLOW_UNSECURE_COMMANDS: true
 
 jobs:
-  # Quality checks for all pushes and PRs
+  # Quality checks for all pushes, PRs, and tag creation
   quality-checks:
     name: Quality Checks
     runs-on: ubuntu-latest
-    if: github.event_name == 'push' || github.event_name == 'pull_request'
+    if: github.event_name == 'push' || github.event_name == 'pull_request' || github.event_name == 'create'
 
     steps:
       - name: Checkout code
@@ -73,11 +73,11 @@ jobs:
             bandit-report.json
             safety-report.json
 
-  # Testing for all pushes and PRs
+  # Testing for all pushes, PRs, and tag creation
   test:
     name: Testing
     runs-on: ubuntu-latest
-    if: github.event_name == 'push' || github.event_name == 'pull_request'
+    if: github.event_name == 'push' || github.event_name == 'pull_request' || github.event_name == 'create'
     needs: quality-checks
 
     steps:
@@ -125,7 +125,8 @@ jobs:
             coverage.xml
             htmlcov/
 
-  # Production deployment only on prod-* tags
+  # Production deployment ONLY on prod-* tag creation
+  # This job will NOT run on pushes or pull requests
   deploy-production:
     name: Deploy to Production
     runs-on: ubuntu-latest
@@ -136,6 +137,12 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
+
+      - name: Verify tag deployment
+        run: |
+          echo "🚀 Starting production deployment for tag: ${{ github.ref }}"
+          echo "Tag name: ${GITHUB_REF#refs/tags/}"
+          echo "This deployment is triggered by tag creation only"
 
       - name: Extract version from tag
         id: extract_version
