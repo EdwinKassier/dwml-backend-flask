@@ -8,10 +8,13 @@ class CORSConfig:
     """CORS configuration that maintains backwards compatibility."""
 
     @staticmethod
-    def get_cors_config():
+    def get_cors_config(app=None):
         """Get CORS configuration based on environment."""
         # Default to permissive for backwards compatibility
-        origins = current_app.config.get("CORS_ORIGINS", "*")
+        if app:
+            origins = app.config.get("CORS_ORIGINS", "*")
+        else:
+            origins = "*"
 
         if origins == "*":
             # Maintain existing wildcard behavior
@@ -33,7 +36,7 @@ class CORSConfig:
     @staticmethod
     def apply_cors(app):
         """Apply CORS configuration to Flask app."""
-        config = CORSConfig.get_cors_config()
+        config = CORSConfig.get_cors_config(app)
         CORS(
             app,
             resources={

@@ -1,6 +1,6 @@
 import strawberry
 import json
-from .utils import data_collector, graph_creator
+from app.utils import data_collector, graph_creator
 
 
 @strawberry.type

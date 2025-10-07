@@ -37,7 +37,7 @@ class CryptoAnalysisResponseSchema(Schema):
 
     message = fields.Dict(required=True)
     graph_data = fields.List(fields.Dict(), required=True)
-    success = fields.Bool(missing=True)
+    success = fields.Bool(load_default=True)
     error = fields.Str(allow_none=True)
 
 
@@ -47,7 +47,7 @@ class HealthCheckSchema(Schema):
     status = fields.Str(required=True)
     service = fields.Str(required=True)
     version = fields.Str(required=True)
-    timestamp = fields.DateTime(missing=None)
+    timestamp = fields.DateTime(load_default=None)
 
 
 class ErrorResponseSchema(Schema):
@@ -56,7 +56,7 @@ class ErrorResponseSchema(Schema):
     error = fields.Str(required=True)
     message = fields.Str(required=True)
     status_code = fields.Int(required=True)
-    timestamp = fields.DateTime(missing=None)
+    timestamp = fields.DateTime(load_default=None)
 
 
 def validate_crypto_request(data: dict) -> tuple[bool, dict]:

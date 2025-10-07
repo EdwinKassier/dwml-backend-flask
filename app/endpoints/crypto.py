@@ -34,8 +34,8 @@ def main_request():
     logger.info("app test route hit")
     try:
         # PRESERVE: Exact same parameter handling
-        symbol = str(request.args.get("symbol").strip())
-        investment = int(request.args.get("investment"))
+        symbol = str(request.args.get("symbol", "").strip())
+        investment = int(request.args.get("investment", 0))
 
         # NEW: Add input validation with backwards compatibility
         try:
@@ -45,7 +45,7 @@ def main_request():
             return (
                 json.dumps({"message": "Server Failure"}),
                 500,
-                {"ContentType": "application/json"},
+                {"Content-Type": "application/json"},
             )
 
         # PRESERVE: Exact same business logic
@@ -54,18 +54,25 @@ def main_request():
         result = collector.driver_logic()
         graph_data = creator.driver_logic()
 
+        # Parse graph_data if it's a JSON string
+        if isinstance(graph_data, str):
+            try:
+                graph_data = json.loads(graph_data)
+            except json.JSONDecodeError:
+                pass  # Keep as string if not valid JSON
+
         # PRESERVE: Exact same response format
         return (
             json.dumps({"message": result, "graph_data": graph_data}),
             200,
-            {"ContentType": "application/json"},
+            {"Content-Type": "application/json"},
         )
     except Exception:
         # PRESERVE: Exact same error handling
         return (
             json.dumps({"message": "Server Failure"}),
             500,
-            {"ContentType": "application/json"},
+            {"Content-Type": "application/json"},
         )
 
 
@@ -78,8 +85,8 @@ def main_request_grpc():
     logger.info("app test route hit")
     try:
         # PRESERVE: Exact same parameter handling
-        symbol = str(request.args.get("symbol").strip())
-        investment = int(request.args.get("investment"))
+        symbol = str(request.args.get("symbol", "").strip())
+        investment = int(request.args.get("investment", 0))
 
         logger.info(f"app test route hit args {symbol}:{investment}")
 
@@ -148,7 +155,7 @@ def health_check():
     """New health check endpoint - doesn't affect existing functionality."""
     try:
         # Check database connection
-        from app.core.utils.data_cache_alchemy import DataCacheAlchemy
+        from app.utils.data_cache_alchemy import DataCacheAlchemy
 
         test_cache = DataCacheAlchemy("BTC", 1000)
         db_healthy = test_cache.create_connection() is not None
