@@ -21,7 +21,7 @@ if ! [[ $VERSION =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
     exit 1
 fi
 
-TAG_NAME="prod-$VERSION"
+TAG_NAME="prod/v$VERSION"
 
 echo "🚀 Creating production release: $TAG_NAME"
 echo ""

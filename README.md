@@ -445,7 +445,7 @@ ENABLE_MONITORING=True
 
 ### **Trunk-Based Development**
 
-This project follows trunk-based development with production deployments only on `prod-*` tags:
+This project follows trunk-based development with production deployments only on `prod/v*` tags:
 
 1. **Development Flow**
    - All development happens on `main`/`master` branch
@@ -453,7 +453,7 @@ This project follows trunk-based development with production deployments only on
    - No long-lived feature branches
 
 2. **Production Releases**
-   - Production deployments only triggered by `prod-x.x.x` tags
+   - Production deployments only triggered by `prod/vx.x.x` tags
    - All quality checks and tests must pass before deployment
    - Automatic GitHub release creation
 
@@ -535,7 +535,7 @@ make docker-build
 # Run with Docker Compose
 make docker-run
 
-# Pre-deployment checks (run before creating prod-* tag)
+# Pre-deployment checks (run before creating prod/v* tag)
 make pre-deploy
 
 # Create production release

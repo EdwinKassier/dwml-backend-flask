@@ -11,7 +11,7 @@ on:
       - master
   create:
     tags:
-      - 'prod/*'
+      - 'prod/v*'
 
 env:
   PROJECT_ID: ${{ secrets.PROJECT_ID }}
@@ -125,12 +125,12 @@ jobs:
             coverage.xml
             htmlcov/
 
-  # Production deployment ONLY on prod-* tag creation
+  # Production deployment ONLY on prod/v* tag creation
   # This job will NOT run on pushes or pull requests
   deploy-production:
     name: Deploy to Production
     runs-on: ubuntu-latest
-    if: github.event_name == 'create' && startsWith(github.ref, 'refs/tags/prod-')
+    if: github.event_name == 'create' && startsWith(github.ref, 'refs/tags/prod/v')
     needs: [quality-checks, test]
     timeout-minutes: 30
 
@@ -147,7 +147,7 @@ jobs:
       - name: Extract version from tag
         id: extract_version
         run: |
-          VERSION=${GITHUB_REF#refs/tags/prod-}
+          VERSION=${GITHUB_REF#refs/tags/prod/v}
           echo "VERSION=$VERSION" >> $GITHUB_OUTPUT
           echo "SERVICE_NAME=${{ env.REPO_NAME }}-prod" >> $GITHUB_OUTPUT
 
