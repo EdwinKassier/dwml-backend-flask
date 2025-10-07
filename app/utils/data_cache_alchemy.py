@@ -198,8 +198,8 @@ class DataCacheAlchemy:
             GENERATIONDATE=combined_results["GENERATIONDATE"],
         )
 
-        Session = sessionmaker(bind=self.engine)
-        session = Session()
+        create_session = sessionmaker(bind=self.engine)
+        session = create_session()
 
         try:
             session.add(new_item)
