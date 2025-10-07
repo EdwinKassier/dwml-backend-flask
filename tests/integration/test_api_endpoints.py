@@ -1,6 +1,7 @@
 """Integration tests for API endpoints."""
 
 import pytest
+
 from app import create_app
 
 

@@ -200,18 +200,18 @@ jobs:
           release_name: Production Release ${{ steps.extract_version.outputs.VERSION }}
           body: |
             ## Production Release ${{ steps.extract_version.outputs.VERSION }}
-            
+
             This release has been automatically deployed to production after passing all quality checks and tests.
-            
+
             ### Changes
             - See commit history for detailed changes
-            
+
             ### Deployment Details
             - **Service**: ${{ steps.extract_version.outputs.SERVICE_NAME }}
             - **Version**: ${{ steps.extract_version.outputs.VERSION }}
             - **Region**: ${{ env.RUN_REGION }}
             - **Environment**: Production
-            
+
             ### Quality Checks Passed
             - ✅ Code formatting (Black)
             - ✅ Linting (flake8)

@@ -1,9 +1,10 @@
 """Backwards-compatible rate limiting middleware."""
 
-from flask import request, jsonify, current_app
-from functools import wraps
 import time
 from collections import defaultdict, deque
+from functools import wraps
+
+from flask import current_app, jsonify, request
 
 
 class RateLimitMiddleware:

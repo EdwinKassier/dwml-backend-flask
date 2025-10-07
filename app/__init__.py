@@ -24,11 +24,11 @@ except ImportError:
 
 # Import configuration and extensions
 from .config import get_config
-from .extensions import init_extensions
 from .endpoints import crypto_bp, health_bp
-from .schemas import schema
+from .extensions import init_extensions
 from .middleware.cors import CORSConfig
 from .middleware.security import SecurityMiddleware
+from .schemas import schema
 
 # Celery disabled - using SQLite only
 CELERY_AVAILABLE = False

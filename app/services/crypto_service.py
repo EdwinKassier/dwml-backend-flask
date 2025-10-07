@@ -1,6 +1,7 @@
 """Crypto investment analysis service."""
 
-from typing import Dict, List, Any
+from typing import Any, Dict, List
+
 from ..utils.data_collector import DataCollector
 from ..utils.graph_creator import GraphCreator
 

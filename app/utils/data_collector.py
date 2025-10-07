@@ -2,14 +2,14 @@
 
 import traceback
 from datetime import datetime, timedelta
-import requests
+
 import pandas as pd
+import requests
 
 # Import datacache class as a helper class
 # This currently gives a linter error, but it does work as intended
 from app.utils.data_cache import DataCache
 from app.utils.data_cache_alchemy import DataCacheAlchemy
-
 
 # Were I to use an api that requires an api key, this is how we would add it
 # headers_dict =
@@ -119,7 +119,6 @@ class DataCollector:
         """Driver logic to run all business logic"""
 
         try:
-
             dataCache = DataCacheAlchemy(self.coin_symbol, self.investment)
 
             # Irrelevant of what the user gave, we insert the query into the logging table

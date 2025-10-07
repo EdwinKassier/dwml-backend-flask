@@ -1,13 +1,13 @@
 """This is a wrapper for a decorator that we can use on a request"""
 
-from functools import wraps
 import os
 import traceback
+from functools import wraps
 
 # Conditional Firebase imports to avoid issues when Firebase is not installed
 try:
     import firebase_admin
-    from firebase_admin import credentials, firestore, auth
+    from firebase_admin import auth, credentials, firestore
 
     FIREBASE_AVAILABLE = True
 

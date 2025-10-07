@@ -3,12 +3,11 @@
 from .crypto_schemas import (
     CryptoAnalysisRequestSchema,
     CryptoAnalysisResponseSchema,
-    HealthCheckSchema,
     ErrorResponseSchema,
+    HealthCheckSchema,
     validate_crypto_request,
     validate_health_response,
 )
-
 from .graphql_schema import schema
 
 __all__ = [

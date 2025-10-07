@@ -1,5 +1,7 @@
-import strawberry
 import json
+
+import strawberry
+
 from app.utils import data_collector, graph_creator
 
 

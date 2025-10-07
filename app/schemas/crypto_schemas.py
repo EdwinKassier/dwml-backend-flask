@@ -1,6 +1,6 @@
 """Data validation schemas for crypto analysis."""
 
-from marshmallow import Schema, fields, validate, ValidationError
+from marshmallow import Schema, ValidationError, fields, validate
 
 
 class CryptoAnalysisRequestSchema(Schema):

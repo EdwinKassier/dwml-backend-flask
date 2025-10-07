@@ -25,7 +25,7 @@ The response from these routes can vary, it could be a backend response in the f
 
 ## Designing Flask for scale
 
-If you aren't building a microservice server to handle a handful of tasks, as in what you can count on two hands, you will need to implement some method to break up the routes into logical partitions. 
+If you aren't building a microservice server to handle a handful of tasks, as in what you can count on two hands, you will need to implement some method to break up the routes into logical partitions.
 
 Breaking up the routes like this helps you as a developer to create a system that is more easily maintained, but more importantly, a system that is easy to understand. For example; keeping all of the routes related to communicating with third party apis is a good design decision as you can ensure you keep all the code necessary to complete those kinds of tasks in one place and you wont be repeating yourself in other places.
 
@@ -76,7 +76,3 @@ Celery is an asynchronous background task queue. Why it is important in somethin
 ### Why does the blueprint have an empty init file
 
 This file is not necessary, it can be deleted, it is an artifact from the the blueprint having been a standalone flask instance in the past
-
-
-
-

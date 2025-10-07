@@ -1,6 +1,7 @@
 """Health and monitoring endpoints."""
 
 import json
+
 from flask import Blueprint, current_app
 
 health = Blueprint("health", __name__)

@@ -1,6 +1,7 @@
 """Consolidated configuration for the Flask application."""
 
 import os
+
 from dotenv import load_dotenv
 
 # Load environment variables

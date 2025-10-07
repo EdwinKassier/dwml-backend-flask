@@ -1,7 +1,9 @@
 """Unit tests for crypto service."""
 
-import pytest
 from unittest.mock import Mock, patch
+
+import pytest
+
 from app.services.crypto_service import CryptoService
 
 
@@ -16,7 +18,6 @@ class TestCryptoService:
             patch("app.services.crypto_service.DataCollector") as mock_collector,
             patch("app.services.crypto_service.GraphCreator") as mock_creator,
         ):
-
             # Mock the collectors
             mock_collector_instance = Mock()
             mock_collector_instance.driver_logic.return_value = {"profit": 1000}

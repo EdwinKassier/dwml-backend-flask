@@ -1,9 +1,9 @@
 """This module manages the logic to get historical data for a symbol"""
 
 from datetime import datetime, timedelta
-import requests
-import pandas as pd
 
+import pandas as pd
+import requests
 
 # Were I to use an api that requires an api key, this is how we would add it
 # headers_dict =
@@ -74,7 +74,6 @@ class GraphCreator:
         """Driver logic of the class to retrieve historical data"""
 
         try:
-
             if self.check_symbol_exists_on_exchange() is False:
                 return "Symbol doesn't exist"
             print("We should query the api")

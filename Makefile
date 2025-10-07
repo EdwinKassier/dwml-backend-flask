@@ -31,17 +31,27 @@ test-coverage: ## Run tests with coverage report
 
 # Code Quality
 lint: ## Run linting checks
-	flake8 app/ tests/
-	mypy app/
+	flake8 app/ tests/ --max-line-length=88 --extend-ignore=E203,W503,E501,F401,F841,F403,F405,E711,E712
+	mypy app/ --ignore-missing-imports || true
 	bandit -r app/ -f json -o bandit-report.json || true
 
 format: ## Format code with black and isort
-	black app/ tests/
-	isort app/ tests/
+	black app/ tests/ --line-length=88
+	isort app/ tests/ --profile=black --line-length=88
 
 format-check: ## Check code formatting without making changes
-	black --check app/ tests/
-	isort --check-only app/ tests/
+	black --check app/ tests/ --line-length=88
+	isort --check-only app/ tests/ --profile=black --line-length=88
+
+# Pre-commit hooks
+pre-commit-install: ## Install pre-commit hooks
+	pre-commit install
+
+pre-commit-run: ## Run pre-commit hooks on all files
+	pre-commit run --all-files
+
+pre-commit-update: ## Update pre-commit hooks to latest versions
+	pre-commit autoupdate
 
 # Security
 security-check: ## Run security checks

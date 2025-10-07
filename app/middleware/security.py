@@ -1,7 +1,8 @@
 """Backwards-compatible security middleware."""
 
-from flask import request, current_app
 from functools import wraps
+
+from flask import current_app, request
 
 
 class SecurityMiddleware:

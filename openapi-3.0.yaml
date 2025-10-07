@@ -5,14 +5,14 @@ info:
   contact:
     email: edwinkassier@gmail.com
   version: 1.0.0
-  
+
 servers:
   - url: https://localhost/api/v1/project/core
     description: e.g. Internal staging server for testing
 
 
-  
-    
+
+
 paths:
 
   /process_request:
@@ -43,13 +43,13 @@ paths:
               application/json:
                 schema:
                   $ref: '#/components/schemas/Bad_Response'
-                
 
-          
-                
+
+
+
 components:
   schemas:
-    
+
     Request:
       type: object
       properties:
@@ -60,10 +60,10 @@ components:
           type: integer
           example: 123
       # Both properties are required
-      required:  
+      required:
         - symbol
         - investment
-        
+
     Response:
       type: object
       properties:
@@ -81,18 +81,18 @@ components:
               y: 1234.5
             - x: 11-12-2022
               y: 1235.5
-      
+
       required:
         - message
         - graph_data
-        
+
     Bad_Response:
       type: object
       properties:
         message:
           type: string
           example: 'Server Failure'
-      
+
       required:
         - message
 
@@ -137,5 +137,4 @@ responses:
         example: 1234.5
     required:
       - x
-      - y     
-
+      - y

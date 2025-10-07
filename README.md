@@ -461,7 +461,7 @@ This project follows trunk-based development with production deployments only on
    ```bash
    # Run pre-deployment checks
    make pre-deploy
-   
+
    # Create production release
    ./scripts/create-prod-release.sh 1.0.0
    ```
@@ -520,6 +520,11 @@ make format
 
 # Linting and type checking
 make lint
+
+# Pre-commit hooks (Python equivalent of Husky)
+make pre-commit-install  # Install pre-commit hooks
+make pre-commit-run      # Run hooks on all files
+make pre-commit-update   # Update hooks to latest versions
 
 # Security scanning
 make security-check

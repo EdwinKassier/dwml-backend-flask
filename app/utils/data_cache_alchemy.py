@@ -1,6 +1,7 @@
 """This module manages the db using an ORM wrapper"""
 
 from datetime import datetime
+
 from sqlalchemy import Column, DateTime, Float, Integer, String, create_engine, inspect
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
@@ -92,7 +93,6 @@ class DataCacheAlchemy:
         print("Checking if value exists")
 
         try:
-
             create_session = sessionmaker(bind=self.engine)
             session = create_session()
             result = (
@@ -113,7 +113,6 @@ class DataCacheAlchemy:
         """Get cached result for the current query"""
 
         try:
-
             create_session = sessionmaker(bind=self.engine)
             session = create_session()
 
@@ -137,7 +136,6 @@ class DataCacheAlchemy:
         query = f"SELECT * from OPENING_AVERAGE WHERE SYMBOL = '{self.coin_symbol}'"
 
         try:
-
             create_session = sessionmaker(bind=self.engine)
             session = create_session()
 
@@ -163,7 +161,6 @@ class DataCacheAlchemy:
         """Get cached version of the opening price data for the symbol"""
 
         try:
-
             create_session = sessionmaker(bind=self.engine)
             session = create_session()
 
@@ -265,7 +262,6 @@ class DataCacheAlchemy:
         """Check if queried table exists"""
 
         try:
-
             inspector = inspect(self.engine)
             table_exists = inspector.has_table(table_name)
 

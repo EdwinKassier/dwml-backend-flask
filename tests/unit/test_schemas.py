@@ -2,11 +2,12 @@
 
 import pytest
 from marshmallow import ValidationError
+
 from app.schemas.crypto_schemas import (
     CryptoAnalysisRequestSchema,
     CryptoAnalysisResponseSchema,
-    HealthCheckSchema,
     ErrorResponseSchema,
+    HealthCheckSchema,
     validate_crypto_request,
     validate_health_response,
 )

@@ -2,9 +2,9 @@
 
 from .crypto_models import (
     CryptoAnalysisResult,
-    PriceDataPoint,
     GraphData,
     InvestmentAnalysis,
+    PriceDataPoint,
 )
 
 __all__ = ["CryptoAnalysisResult", "PriceDataPoint", "GraphData", "InvestmentAnalysis"]

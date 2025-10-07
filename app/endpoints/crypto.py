@@ -1,19 +1,21 @@
 """Crypto investment analysis endpoints."""
 
 import json
+
 import grpc
 from flask import Blueprint, current_app, request
 from werkzeug.local import LocalProxy
 
-# Import existing modules to preserve behavior
-from app.utils import data_collector, graph_creator
-from app.utils.proto_files import api_pb2_grpc as pb2_grpc
-from app.utils.proto_files import api_pb2 as pb2
 from app.middleware.auth import check_auth
+from app.middleware.rate_limit import rate_limit
 
 # Import new security middleware
 from app.middleware.security import SecurityMiddleware, security_enhanced_route
-from app.middleware.rate_limit import rate_limit
+
+# Import existing modules to preserve behavior
+from app.utils import data_collector, graph_creator
+from app.utils.proto_files import api_pb2 as pb2
+from app.utils.proto_files import api_pb2_grpc as pb2_grpc
 
 core = Blueprint("crypto", __name__)
 logger = LocalProxy(lambda: current_app.logger)

@@ -1,8 +1,10 @@
 """Test configuration and fixtures."""
 
-import pytest
 import json
 import os
+
+import pytest
+
 from app import create_app
 
 
