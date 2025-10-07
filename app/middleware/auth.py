@@ -26,7 +26,8 @@ from flask import abort, request
 
 
 def check_auth(view_function):
-    """This is used in the core app as part of a zero trust model to ensure users are authorized
+    """This is used in the core app as part of a zero trust model to ensure users are
+    authorized
     This would be part of a larger system where we also ensure
     only valid sources of queries can query the api in the first place
     (part of our cloud infrastructure)

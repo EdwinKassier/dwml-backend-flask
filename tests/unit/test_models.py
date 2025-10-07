@@ -1,7 +1,7 @@
 """Unit tests for data models."""
 
-import pytest
-from datetime import datetime
+# import pytest  # Unused import
+# from datetime import datetime  # Unused import
 from app.models.crypto_models import (
     CryptoAnalysisResult,
     PriceDataPoint,

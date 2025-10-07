@@ -22,10 +22,6 @@ except ImportError:
     GRAPHQL_AVAILABLE = False
     GraphQLView = None
 
-# Celery disabled - using SQLite only
-CELERY_AVAILABLE = False
-Celery = None
-
 # Import configuration and extensions
 from .config import get_config
 from .extensions import init_extensions
@@ -33,6 +29,10 @@ from .endpoints import crypto_bp, health_bp
 from .schemas import schema
 from .middleware.cors import CORSConfig
 from .middleware.security import SecurityMiddleware
+
+# Celery disabled - using SQLite only
+CELERY_AVAILABLE = False
+Celery = None
 
 # Celery disabled - using SQLite only
 celery = None

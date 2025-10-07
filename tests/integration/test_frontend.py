@@ -1,9 +1,4 @@
-import unittest
 import pytest
-
-from flask import abort, url_for
-from flask_testing import TestCase
-from os import environ, path
 
 from app import create_app
 

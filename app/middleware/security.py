@@ -5,7 +5,8 @@ from functools import wraps
 
 
 class SecurityMiddleware:
-    """Security middleware that adds security headers without breaking existing functionality."""
+    """Security middleware that adds security headers without breaking existing
+    functionality."""
 
     @staticmethod
     def add_security_headers(response):
