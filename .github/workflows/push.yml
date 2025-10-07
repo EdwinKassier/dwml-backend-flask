@@ -11,7 +11,7 @@ on:
       - master
   create:
     tags:
-      - 'prod-*'
+      - 'prod/*'
 
 env:
   PROJECT_ID: ${{ secrets.PROJECT_ID }}
