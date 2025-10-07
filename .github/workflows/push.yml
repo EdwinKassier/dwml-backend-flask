@@ -152,10 +152,11 @@ jobs:
           echo "SERVICE_NAME=${{ env.REPO_NAME }}-prod" >> $GITHUB_OUTPUT
 
       - name: Set up Google Cloud CLI
-        uses: google-github-actions/setup-gcloud@v1
+        uses: google-github-actions/setup-gcloud@v2
         with:
           service_account_key: ${{ secrets.SA_KEY_JSON }}
           project_id: ${{ env.PROJECT_ID }}
+          export_default_credentials: true
 
       - name: Create Artifact Registry repository
         run: |
@@ -164,8 +165,18 @@ jobs:
             --location=${{ env.RUN_REGION }} \
             --description="Docker repository for ${{ env.REPO_NAME }}" || echo "Repository already exists"
 
+      - name: Verify authentication
+        run: |
+          gcloud auth list
+          gcloud config get-value project
+
       - name: Configure Docker for Artifact Registry
         run: gcloud auth configure-docker ${{ env.RUN_REGION }}-docker.pkg.dev
+
+      - name: Test Docker authentication
+        run: |
+          echo "Testing Docker authentication..."
+          gcloud auth print-access-token | docker login -u oauth2accesstoken --password-stdin https://${{ env.RUN_REGION }}-docker.pkg.dev
 
       - name: Build and push Docker image
         run: |
