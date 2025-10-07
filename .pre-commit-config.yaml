@@ -33,3 +33,13 @@ repos:
       - id: detect-private-key
       - id: mixed-line-ending
       - id: requirements-txt-fixer
+
+  # Custom requirements validation
+  - repo: local
+    hooks:
+      - id: validate-requirements
+        name: Validate requirements.txt
+        entry: ./scripts/validate-requirements.py
+        language: system
+        files: requirements\.txt$
+        pass_filenames: false

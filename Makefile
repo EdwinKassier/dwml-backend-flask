@@ -53,6 +53,9 @@ pre-commit-run: ## Run pre-commit hooks on all files
 pre-commit-update: ## Update pre-commit hooks to latest versions
 	pre-commit autoupdate
 
+validate-requirements: ## Validate requirements.txt for conflicts
+	./scripts/validate-requirements.py
+
 # Security
 security-check: ## Run security checks
 	bandit -r app/ -f json -o bandit-report.json
