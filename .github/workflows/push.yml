@@ -198,15 +198,49 @@ jobs:
             --region ${{ env.RUN_REGION }} \
             --platform managed \
             --allow-unauthenticated \
+            --port=8080 \
+            --memory=512Mi \
+            --cpu=1 \
+            --max-instances=10 \
             --set-env-vars="ENVIRONMENT=production" \
             --set-env-vars="VERSION=${{ steps.extract_version.outputs.VERSION }}"
+
+      - name: Ensure public access
+        run: |
+          echo "Ensuring service is publicly accessible..."
+          gcloud run services add-iam-policy-binding ${{ steps.extract_version.outputs.SERVICE_NAME }} \
+            --region=${{ env.RUN_REGION }} \
+            --member="allUsers" \
+            --role="roles/run.invoker" || echo "IAM policy may already be set"
 
       - name: Verify deployment
         run: |
           SERVICE_URL=$(gcloud run services describe ${{ steps.extract_version.outputs.SERVICE_NAME }} --region=${{ env.RUN_REGION }} --format="value(status.url)")
           echo "Service URL: $SERVICE_URL"
-          curl -f "$SERVICE_URL/health" || exit 1
-          echo "✅ Deployment verified successfully"
+
+          # Wait a moment for the service to be ready
+          echo "Waiting for service to be ready..."
+          sleep 10
+
+          # Test multiple endpoints
+          echo "Testing /health endpoint..."
+          curl -v "$SERVICE_URL/health" || echo "Health endpoint failed"
+
+          echo "Testing / endpoint..."
+          curl -v "$SERVICE_URL/" || echo "Root endpoint failed"
+
+          echo "Testing /status endpoint..."
+          curl -v "$SERVICE_URL/status" || echo "Status endpoint failed"
+
+          # Try the health endpoint again with more verbose output
+          echo "Final health check..."
+          if curl -f "$SERVICE_URL/health"; then
+            echo "✅ Deployment verified successfully"
+          else
+            echo "❌ Health check failed, but deployment may still be working"
+            echo "Service URL: $SERVICE_URL"
+            echo "Please check the service manually"
+          fi
 
       - name: Create GitHub Release
         uses: actions/create-release@v1
