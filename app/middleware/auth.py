@@ -3,6 +3,7 @@
 import os
 import traceback
 from functools import wraps
+from typing import Any, Callable
 
 # Conditional Firebase imports to avoid issues when Firebase is not installed
 try:
@@ -25,7 +26,7 @@ except ImportError:
 from flask import abort, request
 
 
-def check_auth(view_function):
+def check_auth(view_function: Callable[..., Any]) -> Callable[..., Any]:
     """This is used in the core app as part of a zero trust model to ensure users are
     authorized
     This would be part of a larger system where we also ensure
@@ -36,7 +37,7 @@ def check_auth(view_function):
     @wraps(view_function)
     # This decorator allows us to globally call the function to check auth
     # regardless of source
-    def decorated_function(*args, **kwargs):
+    def decorated_function(*args: Any, **kwargs: Any) -> Any:
         """checks for verified request using firebase auth, this also gracefully handles
         anonymous user in the case of front ends where the user can't login"""
         # Check if Firebase is available

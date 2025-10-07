@@ -21,10 +21,12 @@ class Query:
             creator = graph_creator.GraphCreator(symbol)
             result = json.dumps(collector.driver_logic())
             graph_data = creator.driver_logic()
-            return ProcessRequestResult(message=result, graph_data=graph_data)
+            return ProcessRequestResult(
+                message=result, graph_data=json.dumps(graph_data)
+            )
         except Exception as exc:
             print(exc)
-            return ProcessRequestResult(message="Symbol doesn't exist", graph_data=[])
+            return ProcessRequestResult(message="Symbol doesn't exist", graph_data="[]")
 
 
 schema = strawberry.Schema(query=Query)

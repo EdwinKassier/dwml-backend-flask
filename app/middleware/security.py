@@ -1,8 +1,9 @@
 """Backwards-compatible security middleware."""
 
 from functools import wraps
+from typing import Any, Callable, Tuple
 
-from flask import current_app, request
+from flask import Response, current_app, request
 
 
 class SecurityMiddleware:
@@ -10,7 +11,7 @@ class SecurityMiddleware:
     functionality."""
 
     @staticmethod
-    def add_security_headers(response):
+    def add_security_headers(response: Response) -> Response:
         """Add security headers to responses without breaking existing behavior."""
         # Only add headers if not already present (backwards compatible)
         if "X-Content-Type-Options" not in response.headers:
@@ -29,7 +30,7 @@ class SecurityMiddleware:
         return response
 
     @staticmethod
-    def validate_input(symbol, investment):
+    def validate_input(symbol: Any, investment: Any) -> Tuple[str, int]:
         """Validate input parameters while preserving existing behavior."""
         # Preserve existing behavior: convert to string and strip
         symbol = str(symbol).strip() if symbol else ""
@@ -45,7 +46,7 @@ class SecurityMiddleware:
         return symbol, investment
 
     @staticmethod
-    def log_request():
+    def log_request() -> None:
         """Log requests for security monitoring without affecting performance."""
         if current_app.config.get("ENABLE_MONITORING", True):
             current_app.logger.info(
@@ -55,11 +56,11 @@ class SecurityMiddleware:
             )
 
 
-def security_enhanced_route(original_route):
+def security_enhanced_route(original_route: Callable[..., Any]) -> Callable[..., Any]:
     """Decorator that enhances existing routes with security features."""
 
     @wraps(original_route)
-    def wrapper(*args, **kwargs):
+    def wrapper(*args: Any, **kwargs: Any) -> Any:
         # Log the request
         SecurityMiddleware.log_request()
 

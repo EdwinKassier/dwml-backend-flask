@@ -1,10 +1,11 @@
 """This module manages the db using an ORM wrapper"""
 
 from datetime import datetime
+from typing import Any, Optional
 
 from sqlalchemy import Column, DateTime, Float, Integer, String, create_engine, inspect
 from sqlalchemy.ext.declarative import declarative_base
-from sqlalchemy.orm import sessionmaker
+from sqlalchemy.orm import Session, sessionmaker
 
 Base = declarative_base()
 
@@ -49,13 +50,13 @@ class LOGGING(Base):
 class DataCacheAlchemy:
     """Class to control the management of the database using raw SQL"""
 
-    def __init__(self, coin_symbol, investment):
+    def __init__(self, coin_symbol: str, investment: float) -> None:
         self.coin_symbol = coin_symbol
         self.investment = investment
         self.engine = self.create_connection()
         self.setup_db()
 
-    def create_connection(self):
+    def create_connection(self) -> Optional[Any]:
         """Ensure we have a connection to the db"""
         try:
             engine = create_engine("sqlite:///DudeWheresMyLambo.db")
@@ -66,7 +67,7 @@ class DataCacheAlchemy:
             print(exc)
             return None
 
-    def setup_db(self):
+    def setup_db(self) -> None:
         """The set up function will create the db tables if they don't already exist"""
 
         self.create_table()
@@ -74,7 +75,7 @@ class DataCacheAlchemy:
         print("DB setup complete")
 
     # Table creation logic
-    def create_table(self):
+    def create_table(self) -> None:
         """Table creation logic"""
 
         # We will have three tables, a RESULTS table to cache the results of a full query,
@@ -87,7 +88,7 @@ class DataCacheAlchemy:
         except Exception as exc:
             print(exc)
 
-    def check_if_valid_final_result_exists(self):
+    def check_if_valid_final_result_exists(self) -> bool:
         """Check if there exists a freshly cached result for the current query"""
 
         print("Checking if value exists")

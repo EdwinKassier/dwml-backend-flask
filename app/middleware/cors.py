@@ -1,6 +1,8 @@
 """Backwards-compatible CORS configuration."""
 
-from flask import current_app
+from typing import Any, Dict, Optional
+
+from flask import Flask
 from flask_cors import CORS
 
 
@@ -8,7 +10,7 @@ class CORSConfig:
     """CORS configuration that maintains backwards compatibility."""
 
     @staticmethod
-    def get_cors_config(app=None):
+    def get_cors_config(app: Optional[Flask] = None) -> Dict[str, Any]:
         """Get CORS configuration based on environment."""
         # Default to permissive for backwards compatibility
         if app:
@@ -34,7 +36,7 @@ class CORSConfig:
             }
 
     @staticmethod
-    def apply_cors(app):
+    def apply_cors(app: Flask) -> Flask:
         """Apply CORS configuration to Flask app."""
         config = CORSConfig.get_cors_config(app)
         CORS(

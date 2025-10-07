@@ -1,6 +1,7 @@
 """This module manages the logic to get historical data for a symbol"""
 
 from datetime import datetime, timedelta
+from typing import Any, List
 
 import pandas as pd
 import requests
@@ -14,10 +15,10 @@ import requests
 class GraphCreator:
     """Helper class to get historical data"""
 
-    def __init__(self, coin_symbol):
+    def __init__(self, coin_symbol: str) -> None:
         self.coin_symbol = coin_symbol
 
-    def convert_result_to_pd(self, raw):
+    def convert_result_to_pd(self, raw: Any) -> pd.DataFrame:
         """Having been given a raw response from the api request,
         convert this into a pd dataframe"""
 
@@ -50,7 +51,7 @@ class GraphCreator:
 
         return df
 
-    def check_symbol_exists_on_exchange(self):
+    def check_symbol_exists_on_exchange(self) -> bool:
         """Check if we can get data about the given symbol on our target exchange"""
         try:
             check_symbol = (
@@ -70,12 +71,12 @@ class GraphCreator:
             print(exc)
             return False
 
-    def driver_logic(self):
+    def driver_logic(self) -> List[dict[str, Any]]:
         """Driver logic of the class to retrieve historical data"""
 
         try:
             if self.check_symbol_exists_on_exchange() is False:
-                return "Symbol doesn't exist"
+                return []
             print("We should query the api")
 
             # Creating timestamps for the time period before the coin was listed and
@@ -100,10 +101,11 @@ class GraphCreator:
                 {"CloseTime": "x", "ClosePrice": "y"}, axis="columns"
             )
 
-            data_frame = data_frame.to_json(orient="records")
+            data_frame = data_frame.to_dict(orient="records")
 
             print(data_frame)
 
             return data_frame
         except Exception as exc:
             print(exc)
+            return []

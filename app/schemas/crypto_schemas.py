@@ -59,7 +59,7 @@ class ErrorResponseSchema(Schema):
     timestamp = fields.DateTime(load_default=None)
 
 
-def validate_crypto_request(data: dict) -> tuple[bool, dict]:
+def validate_crypto_request(data: dict) -> tuple[bool, dict | list[str]]:
     """
     Validate crypto analysis request data.
 
@@ -77,7 +77,7 @@ def validate_crypto_request(data: dict) -> tuple[bool, dict]:
         return False, e.messages
 
 
-def validate_health_response(data: dict) -> tuple[bool, dict]:
+def validate_health_response(data: dict) -> tuple[bool, dict | list[str]]:
     """
     Validate health check response data.
 

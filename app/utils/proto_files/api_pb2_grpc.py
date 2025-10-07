@@ -8,7 +8,7 @@ from ..proto_files import api_pb2 as api__pb2
 class APIStub(object):
     """The greeting service definition."""
 
-    def __init__(self, channel):
+    def __init__(self, channel):  # type: ignore
         """Constructor.
 
         Args:
@@ -16,27 +16,27 @@ class APIStub(object):
         """
         self.processRequest = channel.unary_unary(
             "/API/processRequest",
-            request_serializer=api__pb2.apiRequest.SerializeToString,
-            response_deserializer=api__pb2.apiResponse.FromString,
+            request_serializer=api__pb2.apiRequest.SerializeToString,  # type: ignore
+            response_deserializer=api__pb2.apiResponse.FromString,  # type: ignore
         )
 
 
 class APIServicer(object):
     """The greeting service definition."""
 
-    def processRequest(self, request, context):
+    def processRequest(self, request, context):  # type: ignore
         """Send a query response"""
         context.set_code(grpc.StatusCode.UNIMPLEMENTED)
         context.set_details("Method not implemented!")
         raise NotImplementedError("Method not implemented!")
 
 
-def add_APIServicer_to_server(servicer, server):
+def add_APIServicer_to_server(servicer, server):  # type: ignore
     rpc_method_handlers = {
         "processRequest": grpc.unary_unary_rpc_method_handler(
             servicer.processRequest,
-            request_deserializer=api__pb2.apiRequest.FromString,
-            response_serializer=api__pb2.apiResponse.SerializeToString,
+            request_deserializer=api__pb2.apiRequest.FromString,  # type: ignore
+            response_serializer=api__pb2.apiResponse.SerializeToString,  # type: ignore
         ),
     }
     generic_handler = grpc.method_handlers_generic_handler("API", rpc_method_handlers)
@@ -64,8 +64,8 @@ class API(object):
             request,
             target,
             "/API/processRequest",
-            api__pb2.apiRequest.SerializeToString,
-            api__pb2.apiResponse.FromString,
+            api__pb2.apiRequest.SerializeToString,  # type: ignore
+            api__pb2.apiResponse.FromString,  # type: ignore
             options,
             channel_credentials,
             insecure,

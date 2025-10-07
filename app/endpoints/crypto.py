@@ -1,6 +1,7 @@
 """Crypto investment analysis endpoints."""
 
 import json
+from typing import Tuple
 
 import grpc
 from flask import Blueprint, current_app, request
@@ -22,7 +23,7 @@ logger = LocalProxy(lambda: current_app.logger)
 
 
 @core.before_request
-def before_request_func():
+def before_request_func() -> None:
     """Ensure logger name is set - EXACT SAME BEHAVIOR."""
     current_app.logger.name = "core"
 
@@ -30,7 +31,7 @@ def before_request_func():
 @core.route("/process_request", methods=["GET"])
 @rate_limit(limit=60, window=60)  # NEW: Add rate limiting
 @security_enhanced_route  # NEW: Add security enhancements
-def main_request():
+def main_request() -> Tuple[str, int, dict[str, str]]:
     """Process a request around the main logic of the api - EXACT SAME BEHAVIOR."""
 
     logger.info("app test route hit")
@@ -81,7 +82,7 @@ def main_request():
 @core.route("/process_request_grpc", methods=["GET"])
 @rate_limit(limit=60, window=60)  # NEW: Add rate limiting
 @security_enhanced_route  # NEW: Add security enhancements
-def main_request_grpc():
+def main_request_grpc() -> Tuple[str, int, dict[str, str]]:
     """Process a request around the main logic of the api - EXACT SAME BEHAVIOR."""
 
     logger.info("app test route hit")
@@ -140,7 +141,7 @@ def main_request_grpc():
 @check_auth  # PRESERVE: Exact same authentication
 @rate_limit(limit=30, window=60)  # NEW: Add rate limiting for auth endpoints
 @security_enhanced_route  # NEW: Add security enhancements
-def restricted():
+def restricted() -> Tuple[str, int, dict[str, str]]:
     """A separate request to test the auth flow - EXACT SAME BEHAVIOR."""
 
     # PRESERVE: Exact same response
@@ -153,7 +154,7 @@ def restricted():
 
 # NEW: Add health check endpoint (non-breaking addition)
 @core.route("/health", methods=["GET"])
-def health_check():
+def health_check() -> Tuple[str, int, dict[str, str]]:
     """New health check endpoint - doesn't affect existing functionality."""
     try:
         # Check database connection

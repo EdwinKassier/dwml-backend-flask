@@ -138,7 +138,7 @@ config = {
 }
 
 
-def get_config(environment=None):
+def get_config(environment: str | None = None) -> type[BaseConfig]:
     """Get configuration based on environment."""
     if environment is None:
         environment = os.environ.get("FLASK_ENV", "development")

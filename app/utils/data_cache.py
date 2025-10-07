@@ -2,6 +2,7 @@
 
 import sqlite3
 from datetime import datetime
+from typing import Any, Optional
 
 from dateutil import parser
 
@@ -9,14 +10,14 @@ from dateutil import parser
 class DataCache:
     """Class to control the management of the database using raw SQL"""
 
-    def __init__(self, coin_symbol, investment):
+    def __init__(self, coin_symbol: str, investment: float) -> None:
         self.coin_symbol = coin_symbol
         self.investment = investment
         self.connection = self.create_connection()
         self.setup_db()
 
     # Set up db connection
-    def create_connection(self):
+    def create_connection(self) -> Optional[sqlite3.Connection]:
         """Ensure we have a connection to the db"""
         try:
             conn = sqlite3.connect("DudeWheresMyLambo.db")
@@ -29,7 +30,7 @@ class DataCache:
         except Exception as exc:
             print(exc)
 
-    def setup_db(self):
+    def setup_db(self) -> None:
         """The set up function will create the db tables if they don't already exist"""
 
         self.create_table("RESULTS")
@@ -38,7 +39,7 @@ class DataCache:
 
         print("DB setup complete")
 
-    def create_table(self, table_name):
+    def create_table(self, table_name: str) -> None:
         """Table creation logic"""
 
         # We will have three tables, a RESULTS table to cache the results of a full query,
@@ -65,6 +66,10 @@ class DataCache:
             INVESTMENT        INT     NOT NULL,
             GENERATIONDATE    TEXT     NOT NULL);"""
 
+        if self.connection is None:
+            print("Database connection is None")
+            return
+
         try:
             if table_name == "RESULTS":
                 self.connection.execute(create_final_result_table)
@@ -76,8 +81,12 @@ class DataCache:
         except Exception as exc:
             print(exc)
 
-    def check_if_valid_final_result_exists(self):
+    def check_if_valid_final_result_exists(self) -> bool:
         """Check if there exists a freshly cached result for the current query"""
+
+        if self.connection is None:
+            print("Database connection is None")
+            return False
 
         # Create cursor
         cur = self.connection.cursor()
@@ -107,8 +116,12 @@ class DataCache:
             # There doesn\'t exist a valid historical query
             return False
 
-    def get_valid_final_result(self):
+    def get_valid_final_result(self) -> dict:
         """Get cached result for the current query"""
+
+        if self.connection is None:
+            print("Database connection is None")
+            return {}
 
         # Create cursor
         cur = self.connection.cursor()
@@ -126,9 +139,13 @@ class DataCache:
 
         return {}
 
-    def check_if_historical_cache_exists(self):
+    def check_if_historical_cache_exists(self) -> bool:
         """Check if we have already stored a cached version
         of the opening price data for the symbol"""
+
+        if self.connection is None:
+            print("Database connection is None")
+            return False
 
         # Create cursor
         cur = self.connection.cursor()

@@ -2,6 +2,7 @@
 
 import traceback
 from datetime import datetime, timedelta
+from typing import Any, Dict, List
 
 import pandas as pd
 import requests
@@ -20,11 +21,11 @@ from app.utils.data_cache_alchemy import DataCacheAlchemy
 class DataCollector:
     """Driver class for the api"""
 
-    def __init__(self, coin_symbol, investment):
+    def __init__(self, coin_symbol: str, investment: float) -> None:
         self.coin_symbol = coin_symbol
         self.investment = investment
 
-    def convert_result_to_pd(self, raw):
+    def convert_result_to_pd(self, raw: Any) -> pd.DataFrame:
         """Having been given a raw response from the api request,
         convert this into a pd dataframe"""
 
@@ -94,7 +95,7 @@ class DataCollector:
 
         return result_dict
 
-    def check_symbol_exists_on_exchange(self):
+    def check_symbol_exists_on_exchange(self) -> bool:
         """Check if we can get data about the given symbol on our target exchange"""
         try:
             check_symbol = (
@@ -115,7 +116,7 @@ class DataCollector:
 
             return False
 
-    def driver_logic(self):
+    def driver_logic(self) -> Dict[str, Any]:
         """Driver logic to run all business logic"""
 
         try:

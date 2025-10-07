@@ -9,9 +9,9 @@ from ..utils.graph_creator import GraphCreator
 class CryptoService:
     """Service for crypto investment analysis."""
 
-    def __init__(self):
-        self.data_collector = None
-        self.graph_creator = None
+    def __init__(self) -> None:
+        self.data_collector: DataCollector | None = None
+        self.graph_creator: GraphCreator | None = None
 
     def analyze_investment(self, symbol: str, investment: int) -> Dict[str, Any]:
         """
@@ -52,7 +52,7 @@ class CryptoService:
             collector = DataCollector(
                 symbol, 0
             )  # No investment needed for historical data
-            return collector.get_historical_data()
+            return collector.driver_logic()
         except Exception as e:
             raise Exception(f"Failed to get historical data: {str(e)}")
 
@@ -69,6 +69,6 @@ class CryptoService:
         """
         try:
             collector = DataCollector(symbol, investment)
-            return collector.calculate_profit()
+            return collector.driver_logic()
         except Exception as e:
             raise Exception(f"Profit calculation failed: {str(e)}")

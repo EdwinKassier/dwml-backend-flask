@@ -1,5 +1,7 @@
 """Flask application factory with simplified structure."""
 
+from typing import Any, Optional
+
 from flask import Flask
 
 # Conditional imports to avoid issues when dependencies are not installed
@@ -10,7 +12,8 @@ try:
 except ImportError:
     DOTENV_AVAILABLE = False
 
-    def load_dotenv():
+    def load_dotenv(*args: Any, **kwargs: Any) -> None:
+        """Placeholder function when dotenv is not available."""
         pass
 
 
@@ -20,7 +23,7 @@ try:
     GRAPHQL_AVAILABLE = True
 except ImportError:
     GRAPHQL_AVAILABLE = False
-    GraphQLView = None
+    GraphQLView = None  # type: ignore
 
 # Import configuration and extensions
 from .config import get_config
@@ -38,7 +41,7 @@ Celery = None
 celery = None
 
 
-def create_app(environment=None):
+def create_app(environment: Optional[str] = None) -> Flask:
     """Create Flask application with simplified structure."""
 
     # Load environment variables if dotenv is available
@@ -66,7 +69,7 @@ def create_app(environment=None):
     app.register_blueprint(health_bp)
 
     # Register GraphQL endpoint if available
-    if GRAPHQL_AVAILABLE and GraphQLView:
+    if GRAPHQL_AVAILABLE and GraphQLView is not None:
         app.add_url_rule(
             "/graphql",
             view_func=GraphQLView.as_view("graphql_view", schema=schema),
@@ -74,7 +77,7 @@ def create_app(environment=None):
 
     # Add status endpoints
     @app.route("/status", methods=["GET"])
-    def status():
+    def status() -> tuple[dict[str, str], int]:
         """API status endpoint."""
         return {
             "message": "DudeWheresMyLambo API Status : Running!",
@@ -82,7 +85,7 @@ def create_app(environment=None):
         }, 200
 
     @app.route("/", methods=["GET"])
-    def home():
+    def home() -> tuple[dict[str, str], int]:
         """Welcome endpoint."""
         return {"message": "Welcome to the DudeWheresMyLambo API"}, 200
 

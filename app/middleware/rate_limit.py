@@ -3,6 +3,7 @@
 import time
 from collections import defaultdict, deque
 from functools import wraps
+from typing import Any, Callable
 
 from flask import current_app, jsonify, request
 
@@ -10,12 +11,14 @@ from flask import current_app, jsonify, request
 class RateLimitMiddleware:
     """Simple in-memory rate limiter that doesn't break existing functionality."""
 
-    def __init__(self):
-        self.requests = defaultdict(deque)
+    def __init__(self) -> None:
+        self.requests: dict[str, deque[float]] = defaultdict(deque)
         self.cleanup_interval = 300  # 5 minutes
         self.last_cleanup = time.time()
 
-    def is_rate_limited(self, identifier, limit=60, window=60):
+    def is_rate_limited(
+        self, identifier: str, limit: int = 60, window: int = 60
+    ) -> bool:
         """Check if request should be rate limited."""
         now = time.time()
 
@@ -39,7 +42,7 @@ class RateLimitMiddleware:
         requests.append(now)
         return False
 
-    def _cleanup_old_entries(self, now):
+    def _cleanup_old_entries(self, now: float) -> None:
         """Clean up old entries to prevent memory leaks."""
         cutoff = now - 3600  # 1 hour
         for identifier in list(self.requests.keys()):
@@ -51,7 +54,7 @@ class RateLimitMiddleware:
             if not requests:
                 del self.requests[identifier]
 
-    def get_client_identifier(self):
+    def get_client_identifier(self) -> str:
         """Get unique identifier for rate limiting."""
         # Use IP address as primary identifier
         return request.remote_addr or "unknown"
@@ -61,12 +64,14 @@ class RateLimitMiddleware:
 rate_limiter = RateLimitMiddleware()
 
 
-def rate_limit(limit=60, window=60):
+def rate_limit(
+    limit: int = 60, window: int = 60
+) -> Callable[[Callable[..., Any]], Callable[..., Any]]:
     """Rate limiting decorator that preserves existing behavior."""
 
-    def decorator(f):
+    def decorator(f: Callable[..., Any]) -> Callable[..., Any]:
         @wraps(f)
-        def decorated_function(*args, **kwargs):
+        def decorated_function(*args: Any, **kwargs: Any) -> Any:
             # Only apply rate limiting if enabled
             if not current_app.config.get("RATE_LIMIT_ENABLED", False):
                 return f(*args, **kwargs)
