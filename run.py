@@ -10,26 +10,7 @@ from app import create_app
 app = create_app()
 
 
-# PRESERVE: Exact same status endpoint
-@app.route("/status", methods=["GET"])
-def status():
-    """Indicate the status of the api - EXACT SAME BEHAVIOR."""
-    return (
-        json.dumps({"message": "DudeWheresMyLambo API Status : Running!"}),
-        200,
-        {"ContentType": "application/json"},
-    )
-
-
-# PRESERVE: Exact same home endpoint
-@app.route("/", methods=["GET"])
-def home():
-    """Welcome the user on a request to home - EXACT SAME BEHAVIOR."""
-    return (
-        json.dumps({"message": "Welcome to the DudeWheresMyLambo API"}),
-        200,
-        {"ContentType": "application/json"},
-    )
+# Routes are now defined in app/__init__.py to avoid duplication
 
 
 # NEW: Add backwards-compatible production server support

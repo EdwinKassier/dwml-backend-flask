@@ -152,37 +152,4 @@ def restricted() -> Tuple[str, int, dict[str, str]]:
     )
 
 
-# NEW: Add health check endpoint (non-breaking addition)
-@core.route("/health", methods=["GET"])
-def health_check() -> Tuple[str, int, dict[str, str]]:
-    """New health check endpoint - doesn't affect existing functionality."""
-    try:
-        # Check database connection
-        from app.utils.data_cache_alchemy import DataCacheAlchemy
-
-        test_cache = DataCacheAlchemy("BTC", 1000)
-        db_healthy = test_cache.create_connection() is not None
-
-        return (
-            json.dumps(
-                {
-                    "status": "healthy",
-                    "database": "connected" if db_healthy else "disconnected",
-                    "timestamp": "2024-01-01T00:00:00Z",  # Placeholder
-                }
-            ),
-            200,
-            {"ContentType": "application/json"},
-        )
-    except Exception:
-        return (
-            json.dumps(
-                {
-                    "status": "unhealthy",
-                    "database": "disconnected",
-                    "timestamp": "2024-01-01T00:00:00Z",  # Placeholder
-                }
-            ),
-            503,
-            {"ContentType": "application/json"},
-        )
+# Health check endpoint is defined in app/endpoints/health.py to avoid duplication
