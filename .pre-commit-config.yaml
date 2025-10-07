@@ -42,6 +42,17 @@ repos:
       - id: mixed-line-ending
       - id: requirements-txt-fixer
 
+  # Unit tests - run tests on Python files
+  - repo: local
+    hooks:
+      - id: unit-tests
+        name: Run unit tests
+        entry: python3 -m pytest tests/unit/ -v --tb=short
+        language: system
+        files: \.py$
+        pass_filenames: false
+        always_run: false
+
   # Custom requirements validation
   - repo: local
     hooks:

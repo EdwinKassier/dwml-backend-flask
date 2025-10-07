@@ -57,7 +57,7 @@ class TestCryptoService:
 
         with patch("app.services.crypto_service.DataCollector") as mock_collector:
             mock_collector_instance = Mock()
-            mock_collector_instance.get_historical_data.return_value = [
+            mock_collector_instance.driver_logic.return_value = [
                 {"date": "2023-01-01", "price": 1000}
             ]
             mock_collector.return_value = mock_collector_instance
@@ -72,7 +72,7 @@ class TestCryptoService:
 
         with patch("app.services.crypto_service.DataCollector") as mock_collector:
             mock_collector_instance = Mock()
-            mock_collector_instance.calculate_profit.return_value = {"profit": 500}
+            mock_collector_instance.driver_logic.return_value = {"profit": 500}
             mock_collector.return_value = mock_collector_instance
 
             result = service.calculate_profit("BTC", 1000)
