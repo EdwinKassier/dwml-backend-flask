@@ -157,20 +157,27 @@ jobs:
           service_account_key: ${{ secrets.SA_KEY_JSON }}
           project_id: ${{ env.PROJECT_ID }}
 
-      - name: Configure Docker for GCR
-        run: gcloud auth configure-docker
+      - name: Create Artifact Registry repository
+        run: |
+          gcloud artifacts repositories create ${{ env.REPO_NAME }} \
+            --repository-format=docker \
+            --location=${{ env.RUN_REGION }} \
+            --description="Docker repository for ${{ env.REPO_NAME }}" || echo "Repository already exists"
+
+      - name: Configure Docker for Artifact Registry
+        run: gcloud auth configure-docker ${{ env.RUN_REGION }}-docker.pkg.dev
 
       - name: Build and push Docker image
         run: |
-          docker build -t gcr.io/${{ env.PROJECT_ID }}/${{ steps.extract_version.outputs.SERVICE_NAME }}:${{ steps.extract_version.outputs.VERSION }} .
-          docker push gcr.io/${{ env.PROJECT_ID }}/${{ steps.extract_version.outputs.SERVICE_NAME }}:${{ steps.extract_version.outputs.VERSION }}
+          docker build -t ${{ env.RUN_REGION }}-docker.pkg.dev/${{ env.PROJECT_ID }}/${{ env.REPO_NAME }}/${{ steps.extract_version.outputs.SERVICE_NAME }}:${{ steps.extract_version.outputs.VERSION }} .
+          docker push ${{ env.RUN_REGION }}-docker.pkg.dev/${{ env.PROJECT_ID }}/${{ env.REPO_NAME }}/${{ steps.extract_version.outputs.SERVICE_NAME }}:${{ steps.extract_version.outputs.VERSION }}
         env:
           DOCKER_BUILDKIT: 1
 
       - name: Deploy to Cloud Run
         run: |
           gcloud run deploy ${{ steps.extract_version.outputs.SERVICE_NAME }} \
-            --image gcr.io/${{ env.PROJECT_ID }}/${{ steps.extract_version.outputs.SERVICE_NAME }}:${{ steps.extract_version.outputs.VERSION }} \
+            --image ${{ env.RUN_REGION }}-docker.pkg.dev/${{ env.PROJECT_ID }}/${{ env.REPO_NAME }}/${{ steps.extract_version.outputs.SERVICE_NAME }}:${{ steps.extract_version.outputs.VERSION }} \
             --region ${{ env.RUN_REGION }} \
             --platform managed \
             --allow-unauthenticated \
