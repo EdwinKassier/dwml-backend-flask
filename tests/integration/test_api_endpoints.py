@@ -31,9 +31,7 @@ class TestCryptoEndpoints:
             lambda self: [{"x": "2023-01-01", "y": 1000}],
         )
 
-        response = client.get(
-            "/api/v1/project/core/process_request?symbol=BTC&investment=1000"
-        )
+        response = client.get("/api/v1/process_request?symbol=BTC&investment=1000")
 
         assert response.status_code == 200
         data = response.get_json()
@@ -42,7 +40,7 @@ class TestCryptoEndpoints:
 
     def test_process_request_missing_params(self, client):
         """Test process_request with missing parameters."""
-        response = client.get("/api/v1/project/core/process_request")
+        response = client.get("/api/v1/process_request")
 
         assert response.status_code == 500
         data = response.get_json()
@@ -50,9 +48,7 @@ class TestCryptoEndpoints:
 
     def test_process_request_invalid_params(self, client):
         """Test process_request with invalid parameters."""
-        response = client.get(
-            "/api/v1/project/core/process_request?symbol=&investment=invalid"
-        )
+        response = client.get("/api/v1/process_request?symbol=&investment=invalid")
 
         assert response.status_code == 500
         data = response.get_json()
@@ -60,7 +56,7 @@ class TestCryptoEndpoints:
 
     def test_restricted_endpoint_unauthorized(self, client):
         """Test restricted endpoint without authentication."""
-        response = client.get("/api/v1/project/core/restricted")
+        response = client.get("/api/v1/restricted")
 
         # When Firebase is not available, auth is skipped and returns 200
         # When Firebase is available, it should return 401 for missing auth

@@ -14,21 +14,21 @@ def client():
 
 
 def test_base_route_without_args(client):
-    rv = client.get("/api/v1/project/core/process_request")
+    rv = client.get("/api/v1/process_request")
 
     print(rv.get_data())
     assert rv.status_code == 500
 
 
 def test_base_route_with_args_valid_symbol(client):
-    rv = client.get("/api/v1/project/core/process_request?symbol=BTC&investment=1000")
+    rv = client.get("/api/v1/process_request?symbol=BTC&investment=1000")
 
     print(rv.get_data())
     assert rv.status_code == 200
 
 
 def test_base_route_with_args_invalid_symbol(client):
-    rv = client.get("/api/v1/project/core/process_request?symbol=DUHHH&investment=1000")
+    rv = client.get("/api/v1/process_request?symbol=DUHHH&investment=1000")
 
     print(rv.get_data())
     assert rv.status_code == 200
@@ -36,21 +36,21 @@ def test_base_route_with_args_invalid_symbol(client):
 
 
 def test_base_route_malformed_no_symbol(client):
-    rv = client.get("/api/v1/project/core/process_request?investment=1000")
+    rv = client.get("/api/v1/process_request?investment=1000")
 
     print(rv.get_data())
     assert rv.status_code == 500
 
 
 def test_base_route_malformed_no_investment(client):
-    rv = client.get("/api/v1/project/core/process_request?symbol=BTC")
+    rv = client.get("/api/v1/process_request?symbol=BTC")
 
     print(rv.get_data())
     assert rv.status_code == 500
 
 
 def test_auth_route_without_auth_header(client):
-    rv = client.get("/api/v1/project/core/restricted")
+    rv = client.get("/api/v1/restricted")
 
     print(rv.get_data())
     # When Firebase is not available, auth is skipped and returns 200
@@ -59,7 +59,7 @@ def test_auth_route_without_auth_header(client):
 
 
 def test_unknown_route(client):
-    rv = client.get("/api/v1/project/core/random")
+    rv = client.get("/api/v1/random")
 
     print(rv.get_data())
     assert rv.status_code == 404
