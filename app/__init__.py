@@ -65,7 +65,7 @@ def create_app(environment: Optional[str] = None) -> Flask:
     #     celery.config_from_object(app.config, force=True)
 
     # Register API blueprints
-    app.register_blueprint(crypto_bp, url_prefix="/api/v1/project/core")
+    app.register_blueprint(crypto_bp, url_prefix="/api/v1")
     app.register_blueprint(health_bp)
 
     # Register GraphQL endpoint if available

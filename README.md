@@ -468,9 +468,9 @@ ENABLE_MONITORING=True
 
 | **Endpoint** | **Method** | **Description** | **Example** |
 |:---|:---|:---|:---|
-| `/api/v1/project/core/process_request` | GET | Example API endpoint | `?param1=value1&param2=value2` |
-| `/api/v1/project/core/process_request_grpc` | GET | Example gRPC endpoint | `?param1=value1&param2=value2` |
-| `/api/v1/project/core/restricted` | GET | Authentication test endpoint | Requires auth |
+| `/api/v1/process_request` | GET | Example API endpoint | `?param1=value1&param2=value2` |
+| `/api/v1/process_request_grpc` | GET | Example gRPC endpoint | `?param1=value1&param2=value2` |
+| `/api/v1/restricted` | GET | Authentication test endpoint | Requires auth |
 | `/health` | GET | Health check | System status |
 | `/status` | GET | API status | Service info |
 | `/metrics` | GET | Application metrics | Performance data |
@@ -480,7 +480,7 @@ ENABLE_MONITORING=True
 
 ```bash
 # Example API call
-curl "http://localhost:8080/api/v1/project/core/process_request?param1=value1&param2=value2"
+curl "http://localhost:8080/api/v1/process_request?param1=value1&param2=value2"
 
 # Health check
 curl http://localhost:8080/health
@@ -505,7 +505,7 @@ curl https://your-domain.com/health
 curl https://your-domain.com/status
 
 # Example API call
-curl -X GET "https://your-domain.com/api/v1/project/core/process_request?param1=value1&param2=value2"
+curl -X GET "https://your-domain.com/api/v1/process_request?param1=value1&param2=value2"
 ```
 
 #### GraphQL
