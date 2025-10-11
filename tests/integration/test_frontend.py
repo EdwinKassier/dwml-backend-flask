@@ -1,4 +1,4 @@
-from datetime import UTC, datetime
+from datetime import datetime, timezone
 from unittest.mock import patch
 
 import pytest
@@ -33,7 +33,7 @@ def test_base_route_with_args_valid_symbol(client):
         "PROFIT": 250.0,
         "GROWTHFACTOR": 0.25,
         "LAMBOS": 0.00125,
-        "GENERATIONDATE": datetime.now(UTC).isoformat(),
+        "GENERATIONDATE": datetime.now(timezone.utc).isoformat(),
         "graph_data": [{"x": "2023-01-01 00:00:00", "y": 20000.0}],
     }
 

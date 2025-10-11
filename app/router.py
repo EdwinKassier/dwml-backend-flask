@@ -1,7 +1,7 @@
 """Root router - registers all domain endpoints."""
 
 import json
-from datetime import UTC, datetime
+from datetime import datetime, timezone
 from typing import Tuple
 
 from flask import Blueprint, Flask
@@ -25,7 +25,7 @@ def health_check() -> Tuple[str, int, dict[str, str]]:
             {
                 "status": "healthy",
                 "service": "dwml-backend",
-                "timestamp": datetime.now(UTC).isoformat(),
+                "timestamp": datetime.now(timezone.utc).isoformat(),
             }
         ),
         200,

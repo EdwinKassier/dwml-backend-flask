@@ -22,7 +22,7 @@ class TestCryptoEndpoints:
     def test_process_request_success(self, client, monkeypatch):
         """Test successful process_request endpoint."""
         # Mock the crypto service
-        from datetime import UTC, datetime
+        from datetime import datetime, timezone
         from decimal import Decimal
 
         mock_result = {
@@ -32,7 +32,7 @@ class TestCryptoEndpoints:
             "PROFIT": 250.0,
             "GROWTHFACTOR": 0.25,
             "LAMBOS": 0.00125,
-            "GENERATIONDATE": datetime.now(UTC).isoformat(),
+            "GENERATIONDATE": datetime.now(timezone.utc).isoformat(),
             "graph_data": [{"x": "2023-01-01 00:00:00", "y": 20000.0}],
         }
 

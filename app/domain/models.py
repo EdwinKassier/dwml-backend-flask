@@ -1,7 +1,7 @@
 """Domain models with business logic."""
 
 from dataclasses import dataclass, field
-from datetime import UTC, datetime
+from datetime import datetime, timezone
 from decimal import Decimal
 
 from .constants import (
@@ -24,7 +24,7 @@ class Investment:
 
     symbol: str
     amount: Decimal
-    created_at: datetime = field(default_factory=lambda: datetime.now(UTC))
+    created_at: datetime = field(default_factory=lambda: datetime.now(timezone.utc))
 
     def __post_init__(self) -> None:
         """Validate investment data on creation."""
