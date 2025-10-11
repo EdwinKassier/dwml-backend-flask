@@ -3,7 +3,7 @@
 import pytest
 from marshmallow import ValidationError
 
-from app.schemas.crypto_schemas import (
+from app.domain.schemas import (
     CryptoAnalysisRequestSchema,
     CryptoAnalysisResponseSchema,
     ErrorResponseSchema,

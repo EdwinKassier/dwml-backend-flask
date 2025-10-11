@@ -21,15 +21,27 @@ class TestCryptoEndpoints:
 
     def test_process_request_success(self, client, monkeypatch):
         """Test successful process_request endpoint."""
-        # Mock the data collector and graph creator
-        monkeypatch.setattr(
-            "app.utils.data_collector.DataCollector.driver_logic",
-            lambda self: {"profit": 1000},
-        )
-        monkeypatch.setattr(
-            "app.utils.graph_creator.GraphCreator.driver_logic",
-            lambda self: [{"x": "2023-01-01", "y": 1000}],
-        )
+        # Mock the crypto service
+        from datetime import UTC, datetime
+        from decimal import Decimal
+
+        mock_result = {
+            "SYMBOL": "BTC",
+            "INVESTMENT": 1000.0,
+            "NUMBERCOINS": 0.05,
+            "PROFIT": 250.0,
+            "GROWTHFACTOR": 0.25,
+            "LAMBOS": 0.00125,
+            "GENERATIONDATE": datetime.now(UTC).isoformat(),
+            "graph_data": [{"x": "2023-01-01 00:00:00", "y": 20000.0}],
+        }
+
+        def mock_get_service():
+            mock_service = type("MockService", (), {})()
+            mock_service.analyze_investment = lambda symbol, amount: mock_result
+            return mock_service
+
+        monkeypatch.setattr("app.domain.routes.get_crypto_service", mock_get_service)
 
         response = client.get("/api/v1/process_request?symbol=BTC&investment=1000")
 
@@ -42,17 +54,18 @@ class TestCryptoEndpoints:
         """Test process_request with missing parameters."""
         response = client.get("/api/v1/process_request")
 
-        assert response.status_code == 500
+        assert response.status_code == 400
         data = response.get_json()
-        assert data["message"] == "Server Failure"
+        assert "error" in data
+        assert "Symbol parameter is required" in data["error"]
 
     def test_process_request_invalid_params(self, client):
         """Test process_request with invalid parameters."""
         response = client.get("/api/v1/process_request?symbol=&investment=invalid")
 
-        assert response.status_code == 500
+        assert response.status_code == 400
         data = response.get_json()
-        assert data["message"] == "Server Failure"
+        assert "error" in data
 
     def test_restricted_endpoint_unauthorized(self, client):
         """Test restricted endpoint without authentication."""
@@ -85,17 +98,14 @@ class TestHealthEndpoints:
         data = response.get_json()
         assert data["status"] == "healthy"
         assert "service" in data
-        assert "version" in data
+        assert "timestamp" in data
 
     def test_metrics_endpoint(self, client):
-        """Test metrics endpoint."""
+        """Test metrics endpoint - should return 404 as it doesn't exist."""
         response = client.get("/metrics")
 
-        assert response.status_code == 200
-        data = response.get_json()
-        assert "uptime" in data
-        assert "status" in data
-        assert "version" in data
+        # Metrics endpoint is not implemented in this version
+        assert response.status_code == 404
 
     def test_status_endpoint(self, client):
         """Test status endpoint."""

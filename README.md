@@ -82,9 +82,9 @@ The boilerplate supports both **REST** and **GraphQL** endpoints, giving you fle
 
 | **Architecture** | **Security** | **Monitoring** | **Performance** |
 |:---|:---|:---|:---|
-| Clean Architecture | Security Scanning | Prometheus Metrics | SQLite Database |
-| Service Layer | Dependency Checks | Structured Logging | Docker Optimization |
-| Dependency Injection | Authentication | Error Tracking | API Rate Limiting |
+| Domain-Driven Design | Security Scanning | Health Checks | SQLite Database |
+| Rich Domain Models | Dependency Checks | Structured Logging | Docker Optimization |
+| Clean Separation | Authentication | Error Tracking | API Rate Limiting |
 
 ### Feature Categories
 
@@ -100,7 +100,18 @@ The boilerplate supports both **REST** and **GraphQL** endpoints, giving you fle
 </details>
 
 <details>
-<summary><b>🏗️ Infrastructure</b></summary>
+<summary><b>🏗️ Architecture</b></summary>
+
+- ✅ **Domain-Driven Design**: Two-domain architecture (domain + shared)
+- ✅ **Rich Domain Models**: Business logic encapsulated in models
+- ✅ **Service Layer**: Orchestration and business workflows
+- ✅ **Central Router**: Single registration point for all domains
+- ✅ **Clean Separation**: Clear boundaries between layers
+
+</details>
+
+<details>
+<summary><b>🔧 Infrastructure</b></summary>
 
 - ✅ **Database**: SQLite (lightweight, file-based)
 - ✅ **Containerization**: Multi-stage Docker builds
@@ -138,22 +149,56 @@ The boilerplate supports both **REST** and **GraphQL** endpoints, giving you fle
 ### Application Structure
 
 ```
-flask-api-boilerplate/
-├── app/                    # Flask application
-│   ├── endpoints/         # API endpoints
-│   ├── services/          # Business logic
-│   ├── models/           # Data models
-│   ├── schemas/          # Validation schemas
-│   ├── utils/            # Utility functions
-│   └── middleware/       # Security & rate limiting
-├── tests/                # Test suites
-├── docs/                 # Documentation
-├── scripts/              # Deployment scripts
-├── .github/workflows/    # CI/CD pipelines
-├── Dockerfile           # Container configuration
-├── docker-compose.yml   # Docker Compose
-└── Makefile            # Development commands
+dwml-backend-flask/
+├── app/                      # Flask application
+│   ├── domain/              # Main DWML application domain (complete)
+│   │   ├── models.py        # Domain models (Investment, PriceData)
+│   │   ├── services.py      # Business logic (CryptoAnalysisService)
+│   │   ├── routes.py        # HTTP endpoints (REST API)
+│   │   ├── schemas.py       # Validation schemas (Marshmallow)
+│   │   ├── graphql_schema.py # GraphQL API schema
+│   │   ├── proto_files/     # gRPC protocol buffers
+│   │   ├── exceptions.py    # Domain-specific exceptions
+│   │   └── constants.py     # Domain constants
+│   ├── shared/              # Shared infrastructure
+│   │   └── middleware/      # Cross-cutting concerns
+│   │       ├── auth.py      # Firebase authentication
+│   │       ├── cors.py      # CORS configuration
+│   │       ├── error_handler.py # Centralized error handling
+│   │       ├── rate_limit.py # Rate limiting
+│   │       └── security.py  # Security headers
+│   ├── router.py            # Central route registration
+│   ├── config.py            # Configuration management
+│   └── extensions.py        # Flask extensions (SQLAlchemy)
+├── tests/                   # Test suites
+│   ├── unit/               # Unit tests
+│   └── integration/        # Integration tests
+├── docs/                    # Documentation
+├── scripts/                 # Deployment scripts
+├── .github/workflows/       # CI/CD pipelines
+├── Dockerfile              # Container configuration
+├── docker-compose.yml      # Docker Compose
+└── Makefile               # Development commands
 ```
+
+### Architecture Principles
+
+This project follows a **clean domain-driven architecture**:
+
+#### 🎯 **`domain/`** - Complete DWML Application Domain
+The domain owns its **entire vertical slice**:
+- **Business Logic**: Rich domain models with business rules
+- **REST API**: HTTP endpoints via Flask blueprints
+- **GraphQL API**: Flexible query interface
+- **gRPC API**: Protocol buffer definitions
+- **Validation**: Request/response schemas
+- **Error Handling**: Domain-specific exceptions
+- **Configuration**: Domain constants
+
+#### 🔧 **`shared/`** - Shared Infrastructure
+Cross-cutting concerns used by all domains:
+- **Middleware**: Authentication, CORS, rate limiting, security
+- *(Future)* Common utilities, helpers, reusable components
 
 ### Database Architecture
 
@@ -423,34 +468,30 @@ ENABLE_MONITORING=True
 
 ### Production Monitoring
 
-| **Health Checks** | **Metrics** | **Logging** |
+| **Health Checks** | **Status** | **Logging** |
 |:---|:---|:---|
-| *System Status* | *Performance Data* | *Structured Logs* |
-| ```bash<br/>GET /health<br/>``` | ```bash<br/>GET /metrics<br/>``` | ```bash<br/># JSON structured logging<br/>``` |
-| ✅ Application health | ✅ Request metrics | ✅ Request logging |
-| ✅ Database status | ✅ Response times | ✅ Error logging |
-| ✅ Service status | ✅ Error rates | ✅ Performance logs |
+| *System Status* | *Service Info* | *Structured Logs* |
+| ```bash<br/>GET /health<br/>``` | ```bash<br/>GET /status<br/>``` | ```bash<br/># Python logging<br/>``` |
+| ✅ Application health | ✅ API version | ✅ Request logging |
+| ✅ Service status | ✅ Service name | ✅ Error logging |
+| ✅ Timestamp | ✅ Running status | ✅ Performance logs |
 
 ### Health Check Response
 
 ```json
 {
   "status": "healthy",
-  "version": "1.0.0",
-  "environment": "development",
-  "database": "connected",
-  "redis": "connected"
+  "service": "dwml-backend",
+  "timestamp": "2024-01-01T00:00:00.000000"
 }
 ```
 
-### Metrics Response
+### Status Response
 
 ```json
 {
-  "requests_total": 1250,
-  "response_time_avg": 45.2,
-  "error_rate": 0.02,
-  "active_connections": 12
+  "message": "DudeWheresMyLambo API Status : Running!",
+  "version": "1.0.0"
 }
 ```
 
@@ -460,36 +501,68 @@ ENABLE_MONITORING=True
 
 ### Interactive API Documentation
 
-| **Health** | **Documentation** | **Metrics** | **GraphQL** |
+| **Health** | **Status** | **Welcome** | **GraphQL** |
 |:---|:---|:---|:---|
-| ```bash<br/>GET /health<br/>``` | ```bash<br/>GET /status<br/>``` | ```bash<br/>GET /metrics<br/>``` | ```bash<br/>POST /graphql<br/>``` |
+| ```bash<br/>GET /health<br/>``` | ```bash<br/>GET /status<br/>``` | ```bash<br/>GET /<br/>``` | ```bash<br/>POST /graphql<br/>``` |
 
 ### Main Endpoints
 
-| **Endpoint** | **Method** | **Description** | **Example** |
+All endpoints are registered through the central router (`app/router.py`):
+
+| **Endpoint** | **Method** | **Description** | **Domain** |
 |:---|:---|:---|:---|
-| `/api/v1/process_request` | GET | Example API endpoint | `?param1=value1&param2=value2` |
-| `/api/v1/process_request_grpc` | GET | Example gRPC endpoint | `?param1=value1&param2=value2` |
-| `/api/v1/restricted` | GET | Authentication test endpoint | Requires auth |
-| `/health` | GET | Health check | System status |
-| `/status` | GET | API status | Service info |
-| `/metrics` | GET | Application metrics | Performance data |
-| `/graphql` | POST | GraphQL endpoint | Flexible queries |
+| `/api/v1/process_request` | GET | Analyze crypto investment | `domain` |
+| `/api/v1/process_request_grpc` | GET | Analyze via gRPC | `domain` |
+| `/api/v1/restricted` | GET | Authentication test | `domain` |
+| `/health` | GET | Health check | `router` |
+| `/status` | GET | API status | `router` |
+| `/` | GET | Welcome message | `router` |
+| `/graphql` | POST | GraphQL endpoint | `schemas` |
+
+**Request Example:**
+```bash
+GET /api/v1/process_request?symbol=BTC&investment=1000
+```
+
+**Response:**
+```json
+{
+  "message": {
+    "SYMBOL": "BTC",
+    "INVESTMENT": 1000.0,
+    "NUMBERCOINS": 0.05,
+    "PROFIT": 250.0,
+    "GROWTHFACTOR": 0.25,
+    "LAMBOS": 0.00125,
+    "GENERATIONDATE": "2024-01-01T00:00:00Z"
+  },
+  "graph_data": [
+    {"x": "2024-01-01 00:00:00", "y": 20000.0},
+    {"x": "2024-01-02 00:00:00", "y": 21000.0}
+  ]
+}
+```
 
 ### API Usage Examples
 
 ```bash
-# Example API call
-curl "http://localhost:8080/api/v1/process_request?param1=value1&param2=value2"
+# Analyze crypto investment
+curl "http://localhost:8080/api/v1/process_request?symbol=BTC&investment=1000"
+
+# Analyze via gRPC
+curl "http://localhost:8080/api/v1/process_request_grpc?symbol=ETH&investment=500"
 
 # Health check
 curl http://localhost:8080/health
 
-# Metrics
-curl http://localhost:8080/metrics
-
 # Status
 curl http://localhost:8080/status
+
+# Welcome message
+curl http://localhost:8080/
+
+# Authenticated endpoint (requires Firebase token)
+curl -H "Authorization: Bearer <token>" http://localhost:8080/api/v1/restricted
 ```
 
 ### Interacting with the Live System
@@ -501,19 +574,22 @@ Once deployed, you can interact with the system through multiple interfaces:
 # Health check
 curl https://your-domain.com/health
 
-# API documentation
+# API status
 curl https://your-domain.com/status
 
-# Example API call
-curl -X GET "https://your-domain.com/api/v1/process_request?param1=value1&param2=value2"
+# Analyze crypto investment
+curl "https://your-domain.com/api/v1/process_request?symbol=BTC&investment=1000"
+
+# Analyze via gRPC
+curl "https://your-domain.com/api/v1/process_request_grpc?symbol=ETH&investment=500"
 ```
 
 #### GraphQL
 ```bash
-# GraphQL endpoint
+# GraphQL query
 curl -X POST https://your-domain.com/graphql \
   -H "Content-Type: application/json" \
-  -d '{"query": "{ __schema { types { name } } }"}'
+  -d '{"query": "{ processRequest(symbol: \"BTC\", investment: 1000) { message graphData } }"}'
 ```
 
 ---
@@ -523,22 +599,78 @@ curl -X POST https://your-domain.com/graphql \
 ### Organized Codebase
 
 ```
-flask-api-boilerplate/
-├── app/                 # Flask application
-│   ├── endpoints/      # API endpoints
-│   ├── services/       # Business logic
-│   ├── models/         # Data models
-│   ├── schemas/        # Validation schemas
-│   ├── utils/          # Utility functions
-│   └── middleware/     # Security & rate limiting
-├── tests/              # Test suites
-├── docs/               # Documentation
-├── scripts/            # Deployment scripts
-├── .github/workflows/  # CI/CD pipelines
-├── Dockerfile         # Container configuration
-├── docker-compose.yml # Docker Compose
-└── Makefile          # Development commands
+dwml-backend-flask/
+├── app/                      # Flask application
+│   ├── domain/              # Main DWML application domain (complete)
+│   │   ├── __init__.py      # Domain exports
+│   │   ├── models.py        # Domain models (Investment, PriceData)
+│   │   ├── services.py      # Business logic (CryptoAnalysisService)
+│   │   ├── routes.py        # HTTP endpoints (REST API)
+│   │   ├── schemas.py       # Validation schemas (Marshmallow)
+│   │   ├── graphql_schema.py # GraphQL API schema
+│   │   ├── proto_files/     # gRPC protocol buffers
+│   │   │   ├── api.proto    # Protocol definition
+│   │   │   ├── api_pb2.py   # Generated Python code
+│   │   │   └── api_pb2_grpc.py # gRPC stubs
+│   │   ├── exceptions.py    # Domain-specific exceptions
+│   │   └── constants.py     # Domain constants (LAMBO_PRICE, etc.)
+│   ├── shared/              # Shared infrastructure
+│   │   └── middleware/      # Cross-cutting concerns
+│   │       ├── __init__.py
+│   │       ├── auth.py      # Firebase authentication
+│   │       ├── cors.py      # CORS configuration
+│   │       ├── error_handler.py # Centralized error handling
+│   │       ├── rate_limit.py # Rate limiting
+│   │       └── security.py  # Security headers
+│   ├── router.py            # Central route registration
+│   ├── config.py            # Configuration management
+│   ├── extensions.py        # Flask extensions (SQLAlchemy, etc.)
+│   └── __init__.py         # Application factory
+├── tests/                   # Test suites
+│   ├── unit/               # Unit tests (models, services, schemas)
+│   ├── integration/        # Integration tests (API endpoints)
+│   ├── fixtures/           # Test fixtures and data
+│   └── conftest.py         # Pytest configuration
+├── docs/                    # Documentation
+│   ├── Architecture.png    # Architecture diagram
+│   └── BuildPipeline.png   # CI/CD pipeline diagram
+├── scripts/                 # Utility scripts
+│   ├── create-prod-release.sh    # Production release script
+│   └── setup-pre-commit.sh       # Pre-commit setup
+├── .github/workflows/       # CI/CD pipelines
+│   └── push.yml            # GitHub Actions workflow
+├── Dockerfile              # Container configuration
+├── docker-compose.yml      # Docker Compose setup
+├── Makefile               # Development commands
+├── requirements.txt        # Python dependencies
+├── pyproject.toml         # Python project config
+└── README.md              # This file
 ```
+
+### Clean Domain-Driven Architecture
+
+**Perfect Domain Ownership:**
+
+Each domain owns its **entire vertical slice**:
+
+#### 🎯 `app/domain/` - DWML Application
+- **Business Logic**: `models.py`, `services.py`
+- **API Interfaces**: `routes.py` (REST), `graphql_schema.py` (GraphQL), `proto_files/` (gRPC)
+- **Validation**: `schemas.py` (Marshmallow)
+- **Error Handling**: `exceptions.py`
+- **Configuration**: `constants.py`
+
+#### 🔧 `app/shared/` - Shared Infrastructure
+- **Middleware**: Authentication, CORS, rate limiting, security headers
+- *(Add shared utilities as needed)*
+
+**Key Benefits:**
+- ✅ Complete domain ownership (100% vertical slice)
+- ✅ Zero scattered code across folders
+- ✅ Clear separation of concerns
+- ✅ Easy to test, maintain, and scale
+- ✅ Simple to add new domains
+- ✅ True Domain-Driven Design
 
 ---
 

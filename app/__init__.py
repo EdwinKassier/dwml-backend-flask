@@ -27,11 +27,12 @@ except ImportError:
 
 # Import configuration and extensions
 from .config import get_config
-from .endpoints import crypto_bp, health_bp
+from .domain.graphql_schema import schema
 from .extensions import init_extensions
-from .middleware.cors import CORSConfig
-from .middleware.security import SecurityMiddleware
-from .schemas import schema
+from .router import register_routes
+from .shared.middleware.cors import CORSConfig
+from .shared.middleware.error_handler import register_error_handlers
+from .shared.middleware.security import SecurityMiddleware
 
 # Celery disabled - using SQLite only
 CELERY_AVAILABLE = False
@@ -60,13 +61,15 @@ def create_app(environment: Optional[str] = None) -> Flask:
     CORSConfig.apply_cors(app)
     app.after_request(SecurityMiddleware.add_security_headers)
 
+    # Register error handlers
+    register_error_handlers(app)
+
     # Celery disabled - using SQLite only
     # if CELERY_AVAILABLE and celery:
     #     celery.config_from_object(app.config, force=True)
 
-    # Register API blueprints
-    app.register_blueprint(crypto_bp, url_prefix="/api/v1")
-    app.register_blueprint(health_bp)
+    # Register all domain routes
+    register_routes(app)
 
     # Register GraphQL endpoint if available
     if GRAPHQL_AVAILABLE and GraphQLView is not None:
@@ -74,19 +77,5 @@ def create_app(environment: Optional[str] = None) -> Flask:
             "/graphql",
             view_func=GraphQLView.as_view("graphql_view", schema=schema),
         )
-
-    # Add status endpoints
-    @app.route("/status", methods=["GET"])
-    def status() -> tuple[dict[str, str], int]:
-        """API status endpoint."""
-        return {
-            "message": "DudeWheresMyLambo API Status : Running!",
-            "version": "1.0.0",
-        }, 200
-
-    @app.route("/", methods=["GET"])
-    def home() -> tuple[dict[str, str], int]:
-        """Welcome endpoint."""
-        return {"message": "Welcome to the DudeWheresMyLambo API"}, 200
 
     return app

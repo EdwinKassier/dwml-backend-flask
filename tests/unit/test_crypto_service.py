@@ -1,10 +1,11 @@
 """Unit tests for crypto service."""
 
+from decimal import Decimal
 from unittest.mock import Mock, patch
 
 import pytest
 
-from app.services.crypto_service import CryptoService
+from app.domain.services import CryptoAnalysisService
 
 
 class TestCryptoService:
@@ -12,69 +13,64 @@ class TestCryptoService:
 
     def test_analyze_investment_success(self):
         """Test successful investment analysis."""
-        service = CryptoService()
+        # Create mock repositories
+        mock_price_repo = Mock()
+        mock_investment_repo = Mock()
 
-        with (
-            patch("app.services.crypto_service.DataCollector") as mock_collector,
-            patch("app.services.crypto_service.GraphCreator") as mock_creator,
-        ):
-            # Mock the collectors
-            mock_collector_instance = Mock()
-            mock_collector_instance.driver_logic.return_value = {"profit": 1000}
-            mock_collector.return_value = mock_collector_instance
+        # Configure mock price repo
+        mock_price_repo.symbol_exists.return_value = True
 
-            mock_creator_instance = Mock()
-            mock_creator_instance.driver_logic.return_value = [
-                {"x": "2023-01-01", "y": 1000}
-            ]
-            mock_creator.return_value = mock_creator_instance
+        # Mock price data
+        mock_price_data = Mock()
+        mock_price_data.get_opening_average.return_value = Decimal("10000")
+        mock_price_data.get_current_average.return_value = Decimal("15000")
+        mock_price_data.to_chart_data.return_value = [{"x": "2023-01-01", "y": 10000}]
+        mock_price_repo.get_price_data.return_value = mock_price_data
 
-            # Test the service
-            result = service.analyze_investment("BTC", 1000)
+        # Create service with mocked repos
+        service = CryptoAnalysisService(mock_price_repo, mock_investment_repo)
 
-            # Verify the result
-            assert "message" in result
-            assert "graph_data" in result
-            assert result["message"] == {"profit": 1000}
-            assert result["graph_data"] == [{"x": "2023-01-01", "y": 1000}]
+        # Test the service
+        result = service.analyze_investment("BTC", Decimal(1000))
 
-    def test_analyze_investment_failure(self):
-        """Test investment analysis failure."""
-        service = CryptoService()
+        # Verify the result
+        assert "SYMBOL" in result
+        assert "INVESTMENT" in result
+        assert "PROFIT" in result
+        assert "graph_data" in result
+        assert result["SYMBOL"] == "BTC"
+        assert result["INVESTMENT"] == 1000.0
+        mock_investment_repo.log_query.assert_called_once()
 
-        with patch("app.services.crypto_service.DataCollector") as mock_collector:
-            mock_collector_instance = Mock()
-            mock_collector_instance.driver_logic.side_effect = Exception("API Error")
-            mock_collector.return_value = mock_collector_instance
+    def test_analyze_investment_symbol_not_found(self):
+        """Test investment analysis with non-existent symbol."""
+        from app.domain.exceptions import SymbolNotFoundError
 
-            # Test that exception is raised
-            with pytest.raises(Exception, match="Analysis failed: API Error"):
-                service.analyze_investment("BTC", 1000)
+        # Create mock repositories
+        mock_price_repo = Mock()
+        mock_investment_repo = Mock()
 
-    def test_get_historical_data(self):
-        """Test getting historical data."""
-        service = CryptoService()
+        # Configure mock to return False for symbol_exists
+        mock_price_repo.symbol_exists.return_value = False
 
-        with patch("app.services.crypto_service.DataCollector") as mock_collector:
-            mock_collector_instance = Mock()
-            mock_collector_instance.driver_logic.return_value = [
-                {"date": "2023-01-01", "price": 1000}
-            ]
-            mock_collector.return_value = mock_collector_instance
+        # Create service
+        service = CryptoAnalysisService(mock_price_repo, mock_investment_repo)
 
-            result = service.get_historical_data("BTC")
+        # Test that exception is raised
+        with pytest.raises(SymbolNotFoundError):
+            service.analyze_investment("INVALID", Decimal(1000))
 
-            assert result == [{"date": "2023-01-01", "price": 1000}]
+    def test_analyze_investment_invalid_amount(self):
+        """Test investment analysis with invalid amount."""
+        from app.domain.exceptions import InvalidInvestmentError
 
-    def test_calculate_profit(self):
-        """Test profit calculation."""
-        service = CryptoService()
+        # Create mock repositories
+        mock_price_repo = Mock()
+        mock_investment_repo = Mock()
 
-        with patch("app.services.crypto_service.DataCollector") as mock_collector:
-            mock_collector_instance = Mock()
-            mock_collector_instance.driver_logic.return_value = {"profit": 500}
-            mock_collector.return_value = mock_collector_instance
+        # Create service
+        service = CryptoAnalysisService(mock_price_repo, mock_investment_repo)
 
-            result = service.calculate_profit("BTC", 1000)
-
-            assert result == {"profit": 500}
+        # Test that exception is raised for negative amount
+        with pytest.raises(InvalidInvestmentError):
+            service.analyze_investment("BTC", Decimal(-1000))

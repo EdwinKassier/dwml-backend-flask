@@ -1,141 +1,165 @@
-"""Unit tests for data models."""
+"""Unit tests for domain models."""
 
-# import pytest  # Unused import
-# from datetime import datetime  # Unused import
-from app.models.crypto_models import (
-    CryptoAnalysisResult,
-    GraphData,
-    InvestmentAnalysis,
-    PriceDataPoint,
-)
+from datetime import datetime
+from decimal import Decimal
 
+import pytest
 
-class TestCryptoAnalysisResult:
-    """Test CryptoAnalysisResult model."""
-
-    def test_crypto_analysis_result_creation(self):
-        """Test creating a crypto analysis result."""
-        result = CryptoAnalysisResult(
-            symbol="BTC",
-            investment=1000,
-            number_coins=0.1,
-            profit=500,
-            growth_factor=1.5,
-            lambos=2.5,
-            generation_date="2023-01-01",
-        )
-
-        assert result.symbol == "BTC"
-        assert result.investment == 1000
-        assert result.number_coins == 0.1
-        assert result.profit == 500
-        assert result.growth_factor == 1.5
-        assert result.lambos == 2.5
-        assert result.generation_date == "2023-01-01"
-
-    def test_crypto_analysis_result_to_dict(self):
-        """Test converting to dictionary."""
-        result = CryptoAnalysisResult(
-            symbol="BTC",
-            investment=1000,
-            number_coins=0.1,
-            profit=500,
-            growth_factor=1.5,
-            lambos=2.5,
-            generation_date="2023-01-01",
-        )
-
-        data = result.to_dict()
-
-        assert data["SYMBOL"] == "BTC"
-        assert data["INVESTMENT"] == 1000
-        assert data["NUMBERCOINS"] == 0.1
-        assert data["PROFIT"] == 500
-        assert data["GROWTHFACTOR"] == 1.5
-        assert data["LAMBOS"] == 2.5
-        assert data["GENERATIONDATE"] == "2023-01-01"
+from app.domain.exceptions import InsufficientPriceDataError, InvalidInvestmentError
+from app.domain.models import Investment, PriceData
 
 
-class TestPriceDataPoint:
-    """Test PriceDataPoint model."""
+class TestInvestment:
+    """Test Investment domain model."""
 
-    def test_price_data_point_creation(self):
-        """Test creating a price data point."""
-        point = PriceDataPoint(timestamp="2023-01-01", price=1000.0, volume=100.0)
+    def test_investment_creation(self):
+        """Test creating a valid investment."""
+        investment = Investment(symbol="BTC", amount=Decimal(1000))
 
-        assert point.timestamp == "2023-01-01"
-        assert point.price == 1000.0
-        assert point.volume == 100.0
+        assert investment.symbol == "BTC"
+        assert investment.amount == Decimal(1000)
+        assert isinstance(investment.created_at, datetime)
 
-    def test_price_data_point_to_dict(self):
-        """Test converting to dictionary."""
-        point = PriceDataPoint(timestamp="2023-01-01", price=1000.0)
+    def test_investment_symbol_normalization(self):
+        """Test that symbol is normalized to uppercase."""
+        investment = Investment(symbol="btc", amount=Decimal(1000))
 
-        data = point.to_dict()
+        assert investment.symbol == "BTC"
 
-        assert data["x"] == "2023-01-01"
-        assert data["y"] == 1000.0
+    def test_investment_invalid_amount(self):
+        """Test that negative amount raises error."""
+        with pytest.raises(InvalidInvestmentError):
+            Investment(symbol="BTC", amount=Decimal(-100))
+
+    def test_investment_zero_amount(self):
+        """Test that zero amount raises error."""
+        with pytest.raises(InvalidInvestmentError):
+            Investment(symbol="BTC", amount=Decimal(0))
+
+    def test_investment_invalid_symbol(self):
+        """Test that invalid symbol raises error."""
+        with pytest.raises(InvalidInvestmentError):
+            Investment(symbol="", amount=Decimal(1000))
+
+    def test_investment_symbol_too_long(self):
+        """Test that too long symbol raises error."""
+        with pytest.raises(InvalidInvestmentError):
+            Investment(symbol="VERYLONGSYMBOL", amount=Decimal(1000))
+
+    def test_calculate_coins_purchased(self):
+        """Test calculating number of coins purchased."""
+        investment = Investment(symbol="BTC", amount=Decimal(1000))
+        coins = investment.calculate_coins_purchased(Decimal(10000))
+
+        assert coins == Decimal("0.1")
+
+    def test_calculate_profit(self):
+        """Test calculating profit."""
+        investment = Investment(symbol="BTC", amount=Decimal(1000))
+        profit = investment.calculate_profit(Decimal(10000), Decimal(15000))
+
+        # 1000 / 10000 = 0.1 coins
+        # 0.1 * 15000 = 1500 current value
+        # 1500 - 1000 = 500 profit
+        assert profit == Decimal(500)
+
+    def test_calculate_growth_factor(self):
+        """Test calculating growth factor."""
+        investment = Investment(symbol="BTC", amount=Decimal(1000))
+        growth = investment.calculate_growth_factor(Decimal(10000), Decimal(15000))
+
+        # Profit is 500, investment is 1000
+        # Growth factor = 500 / 1000 = 0.5
+        assert growth == Decimal("0.5")
+
+    def test_calculate_lambos(self):
+        """Test calculating Lamborghini equivalent."""
+        investment = Investment(symbol="BTC", amount=Decimal(1000))
+        lambos = investment.calculate_lambos(Decimal(10000), Decimal(15000))
+
+        # Profit is 500, Lambo price is 200000
+        # Lambos = 500 / 200000 = 0.0025
+        assert lambos == Decimal("0.0025")
 
 
-class TestGraphData:
-    """Test GraphData model."""
+class TestPriceData:
+    """Test PriceData domain model."""
 
-    def test_graph_data_creation(self):
-        """Test creating graph data."""
-        points = [
-            PriceDataPoint("2023-01-01", 1000.0),
-            PriceDataPoint("2023-01-02", 1050.0),
+    def test_price_data_creation(self):
+        """Test creating price data."""
+        prices = [
+            (datetime(2023, 1, 1), Decimal(10000)),
+            (datetime(2023, 1, 2), Decimal(11000)),
+            (datetime(2023, 1, 3), Decimal(12000)),
+            (datetime(2023, 1, 4), Decimal(13000)),
         ]
 
-        graph_data = GraphData(data_points=points, symbol="BTC", time_range="1D")
+        price_data = PriceData(symbol="BTC", prices=prices)
 
-        assert len(graph_data.data_points) == 2
-        assert graph_data.symbol == "BTC"
-        assert graph_data.time_range == "1D"
+        assert price_data.symbol == "BTC"
+        assert len(price_data.prices) == 4
 
-    def test_graph_data_to_list(self):
-        """Test converting to list."""
-        points = [
-            PriceDataPoint("2023-01-01", 1000.0),
-            PriceDataPoint("2023-01-02", 1050.0),
+    def test_price_data_empty_raises_error(self):
+        """Test that empty price list raises error."""
+        with pytest.raises(InsufficientPriceDataError):
+            PriceData(symbol="BTC", prices=[])
+
+    def test_get_opening_average(self):
+        """Test getting opening average."""
+        prices = [
+            (datetime(2023, 1, 1), Decimal(10000)),
+            (datetime(2023, 1, 2), Decimal(12000)),
+            (datetime(2023, 1, 3), Decimal(14000)),
+            (datetime(2023, 1, 4), Decimal(16000)),
+            (datetime(2023, 1, 5), Decimal(18000)),
         ]
 
-        graph_data = GraphData(points, "BTC", "1D")
-        data_list = graph_data.to_list()
+        price_data = PriceData(symbol="BTC", prices=prices)
+        opening_avg = price_data.get_opening_average(weeks=4)
 
-        assert len(data_list) == 2
-        assert data_list[0]["x"] == "2023-01-01"
-        assert data_list[0]["y"] == 1000.0
-        assert data_list[1]["x"] == "2023-01-02"
-        assert data_list[1]["y"] == 1050.0
+        # Average of first 4: (10000 + 12000 + 14000 + 16000) / 4 = 13000
+        assert opening_avg == Decimal(13000)
 
+    def test_get_current_average(self):
+        """Test getting current average."""
+        prices = [
+            (datetime(2023, 1, 1), Decimal(10000)),
+            (datetime(2023, 1, 2), Decimal(12000)),
+            (datetime(2023, 1, 3), Decimal(14000)),
+            (datetime(2023, 1, 4), Decimal(16000)),
+            (datetime(2023, 1, 5), Decimal(18000)),
+        ]
 
-class TestInvestmentAnalysis:
-    """Test InvestmentAnalysis model."""
+        price_data = PriceData(symbol="BTC", prices=prices)
+        current_avg = price_data.get_current_average(weeks=4)
 
-    def test_investment_analysis_creation(self):
-        """Test creating investment analysis."""
-        result = CryptoAnalysisResult("BTC", 1000, 0.1, 500, 1.5, 2.5, "2023-01-01")
-        graph_data = GraphData([PriceDataPoint("2023-01-01", 1000.0)], "BTC", "1D")
+        # Average of last 4: (12000 + 14000 + 16000 + 18000) / 4 = 15000
+        assert current_avg == Decimal(15000)
 
-        analysis = InvestmentAnalysis(
-            analysis_result=result, graph_data=graph_data, success=True
-        )
+    def test_insufficient_data_for_opening_average(self):
+        """Test that insufficient data raises error."""
+        prices = [
+            (datetime(2023, 1, 1), Decimal(10000)),
+            (datetime(2023, 1, 2), Decimal(12000)),
+        ]
 
-        assert analysis.analysis_result == result
-        assert analysis.graph_data == graph_data
-        assert analysis.success is True
-        assert analysis.error_message is None
+        price_data = PriceData(symbol="BTC", prices=prices)
 
-    def test_investment_analysis_to_dict(self):
-        """Test converting to dictionary."""
-        result = CryptoAnalysisResult("BTC", 1000, 0.1, 500, 1.5, 2.5, "2023-01-01")
-        graph_data = GraphData([PriceDataPoint("2023-01-01", 1000.0)], "BTC", "1D")
+        with pytest.raises(InsufficientPriceDataError):
+            price_data.get_opening_average(weeks=4)
 
-        analysis = InvestmentAnalysis(result, graph_data, True)
-        data = analysis.to_dict()
+    def test_to_chart_data(self):
+        """Test converting to chart format."""
+        prices = [
+            (datetime(2023, 1, 1, 12, 0, 0), Decimal(10000)),
+            (datetime(2023, 1, 2, 12, 0, 0), Decimal(11000)),
+        ]
 
-        assert "message" in data
-        assert "graph_data" in data
-        assert "success" in data
-        assert data["success"] is True
+        price_data = PriceData(symbol="BTC", prices=prices)
+        chart_data = price_data.to_chart_data()
+
+        assert len(chart_data) == 2
+        assert chart_data[0]["x"] == "2023-01-01 12:00:00"
+        assert chart_data[0]["y"] == 10000.0
+        assert chart_data[1]["x"] == "2023-01-02 12:00:00"
+        assert chart_data[1]["y"] == 11000.0
