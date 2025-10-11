@@ -1,4 +1,5 @@
 """Domain - DWML application business logic."""
+
 from .exceptions import (
     CryptoDomainError,
     ExternalServiceError,

@@ -1,4 +1,5 @@
 """Root router - registers all domain endpoints."""
+
 import json
 from datetime import UTC, datetime
 from typing import Tuple

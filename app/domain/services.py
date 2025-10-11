@@ -1,4 +1,5 @@
 """Domain services containing business logic."""
+
 import logging
 from decimal import Decimal
 from typing import Any, Dict

@@ -1,4 +1,5 @@
 """Domain constants for crypto investment analysis."""
+
 from decimal import Decimal
 
 # Price of a Lamborghini (used for profit calculations)

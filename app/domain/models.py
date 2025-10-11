@@ -1,4 +1,5 @@
 """Domain models with business logic."""
+
 from dataclasses import dataclass, field
 from datetime import UTC, datetime
 from decimal import Decimal

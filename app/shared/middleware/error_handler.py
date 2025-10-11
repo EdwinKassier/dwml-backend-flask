@@ -1,4 +1,5 @@
 """Centralized error handling for API."""
+
 import json
 import logging
 from typing import Tuple

@@ -1,4 +1,5 @@
 """Domain routes for DWML process_request endpoints."""
+
 import json
 from decimal import Decimal
 from typing import Tuple
