@@ -12,7 +12,6 @@
 
 <div align="center">
 
-[![codecov](https://codecov.io/gh/YOUR_USERNAME/flask-api-boilerplate/branch/master/graph/badge.svg)](https://codecov.io/gh/YOUR_USERNAME/flask-api-boilerplate)
 [![Python 3.10+](https://img.shields.io/badge/python-3.10+-blue.svg)](https://www.python.org/downloads/)
 [![Flask 2.2+](https://img.shields.io/badge/flask-2.2+-green.svg)](https://flask.palletsprojects.com/)
 
@@ -149,11 +148,11 @@ The boilerplate supports both **REST** and **GraphQL** endpoints, giving you fle
 ### Application Structure
 
 ```
-dwml-backend-flask/
+flask-api-boilerplate/
 ├── app/                      # Flask application
-│   ├── domain/              # Main DWML application domain (complete)
-│   │   ├── models.py        # Domain models (Investment, PriceData)
-│   │   ├── services.py      # Business logic (CryptoAnalysisService)
+│   ├── domain/              # Application domain (customize for your use case)
+│   │   ├── models.py        # Domain models
+│   │   ├── services.py      # Business logic services
 │   │   ├── routes.py        # HTTP endpoints (REST API)
 │   │   ├── schemas.py       # Validation schemas (Marshmallow)
 │   │   ├── graphql_schema.py # GraphQL API schema
@@ -185,7 +184,7 @@ dwml-backend-flask/
 
 This project follows a **clean domain-driven architecture**:
 
-#### 🎯 **`domain/`** - Complete DWML Application Domain
+#### 🎯 **`domain/`** - Application Domain
 The domain owns its **entire vertical slice**:
 - **Business Logic**: Rich domain models with business rules
 - **REST API**: HTTP endpoints via Flask blueprints
@@ -227,9 +226,6 @@ Cross-cutting concerns used by all domains:
 # Clone the repository
 git clone <repository-url>
 cd flask-api-boilerplate
-
-# Navigate to project directory
-cd flask-api-boilerplate
 ```
 
 </details>
@@ -266,7 +262,7 @@ nano .env  # or use your preferred editor
 SECRET_KEY=your-secret-key-here
 DEBUG=True
 ALLOWED_HOSTS=localhost,127.0.0.1
-DATABASE_URL=sqlite:///DudeWheresMyLambo.db
+DATABASE_URL=sqlite:///app.db
 ```
 
 </details>
@@ -292,13 +288,29 @@ make dev
 
 ### Choose your preferred installation method
 
-| **Make Commands** | **Docker Compose** | **Manual Installation** |
-|:---|:---|:---|
-| *Recommended* | *Containerized* | *Custom setup* |
-| ```bash<br/>make install-dev<br/>``` | ```bash<br/>docker-compose up -d<br/>``` | ```bash<br/>pip install -r requirements.txt<br/>``` |
-| ✅ Easy setup | ✅ Isolated environment | ✅ Full control |
-| ✅ Automated configuration | ✅ Easy cleanup | ✅ Custom configuration |
-| ✅ Pre-commit hooks | ✅ Production-like setup | ✅ Custom configuration |
+**Make Commands** *(Recommended)*
+```bash
+make install-dev
+```
+- ✅ Easy setup with automated configuration
+- ✅ Pre-commit hooks enabled
+- ✅ All development tools included
+
+**Docker Compose**
+```bash
+docker-compose up -d
+```
+- ✅ Isolated containerized environment
+- ✅ Easy cleanup and management
+- ✅ Production-like setup
+
+**Manual Installation**
+```bash
+pip install -r requirements.txt
+```
+- ✅ Full control over installation
+- ✅ Flexible setup options
+- ✅ Custom dependency management
 
 ### Docker Installation
 
@@ -329,13 +341,12 @@ docker-compose down
 
 ### Testing Suite
 
-| **Unit Tests** | **Integration Tests** | **Coverage Report** | **All Tests** |
-|:---|:---|:---|:---|
-| *Fast & Isolated* | *API & Database* | *Code Coverage* | *Complete Suite* |
-| ```bash<br/>make test-unit<br/>``` | ```bash<br/>make test-integration<br/>``` | ```bash<br/>make test-coverage<br/>``` | ```bash<br/>make test<br/>``` |
-| ✅ Model tests | ✅ API endpoint tests | ✅ Coverage metrics | ✅ Unit + Integration |
-| ✅ Service tests | ✅ Database integration | ✅ HTML reports | ✅ Coverage reporting |
-| ✅ Utility tests | ✅ External service tests | ✅ Coverage goals | ✅ Performance tests |
+| **Test Type** | **Command** | **Description** |
+|:---|:---|:---|
+| **Unit Tests** | `make test-unit` | Fast & isolated tests for models, services, and utilities |
+| **Integration Tests** | `make test-integration` | API endpoint and database integration tests |
+| **Coverage Report** | `make test-coverage` | Generate coverage metrics and HTML reports |
+| **All Tests** | `make test` | Run complete test suite with coverage reporting |
 
 ### Coverage Goals
 
@@ -359,13 +370,13 @@ docker-compose down
 
 ### Automated Code Quality Tools
 
-| **Black** | **Flake8** | **isort** | **Mypy** | **Pre-commit** |
-|:---|:---|:---|:---|:---|
-| *Code Formatting* | *Linting* | *Import Sorting* | *Type Checking* | *Automated Hooks* |
-| ```bash<br/>make format<br/>``` | ```bash<br/>make lint<br/>``` | ```bash<br/>make format<br/>``` | ```bash<br/>make lint<br/>``` | ```bash<br/>pre-commit install<br/>``` |
-| ✅ Consistent formatting | ✅ Style guide compliance | ✅ Import organization | ✅ Type safety | ✅ Git hooks |
-| ✅ Line length: 88 | ✅ Error detection | ✅ Group sorting | ✅ Static analysis | ✅ Auto-checks |
-| ✅ Auto-formatting | ✅ Best practices | ✅ Auto-sorting | ✅ Error prevention | ✅ Quality gates |
+| **Tool** | **Command** | **Purpose** |
+|:---|:---|:---|
+| **Black** | `make format` | Code formatting (88 char line length) |
+| **Flake8** | `make lint` | Style guide compliance and error detection |
+| **isort** | `make format` | Import organization and sorting |
+| **Mypy** | `make lint` | Type checking and static analysis |
+| **Pre-commit** | `pre-commit install` | Automated git hooks and quality gates |
 
 ---
 
@@ -373,13 +384,11 @@ docker-compose down
 
 ### Security Measures
 
-| **Bandit** | **Safety** | **Authentication** |
+| **Tool** | **Command** | **Purpose** |
 |:---|:---|:---|
-| *Security Analysis* | *Dependency Scanning* | *Access Control* |
-| ```bash<br/>make security-check<br/>``` | ```bash<br/>make security-check<br/>``` | ```bash<br/># Firebase, API Key, Session<br/>``` |
-| ✅ Security vulnerabilities | ✅ Known vulnerabilities | ✅ Multiple auth methods |
-| ✅ Best practices | ✅ Dependency updates | ✅ Role-based access |
-| ✅ Risk assessment | ✅ Security patches | ✅ Token management |
+| **Bandit** | `make security-check` | Security vulnerability scanning and risk assessment |
+| **Safety** | `make security-check` | Dependency vulnerability checking and security patches |
+| **Authentication** | Built-in | Firebase, API key, and session-based authentication |
 
 ### Security Configuration
 
@@ -415,14 +424,11 @@ X-XSS-Protection: 1; mode=block
 
 ### Pipeline Triggers
 
-| **Branch Push** | **Pull Request** | **Tag Release** |
+| **Trigger** | **Command** | **Actions** |
 |:---|:---|:---|
-| *Development* | *Code Review* | *Production* |
-| ```bash<br/>git push origin main<br/>``` | ```bash<br/># Create PR to main<br/>``` | ```bash<br/>git tag prod/v1.0.0<br/>git push origin prod/v1.0.0<br/>``` |
-| ✅ Quality checks | ✅ Quality checks | ✅ Full pipeline |
-| ✅ Testing | ✅ Testing | ✅ Production deployment |
-| ✅ Security scans | ✅ Security scans | ✅ Health verification |
-| | ✅ Code review | ✅ Release creation |
+| **Branch Push** | `git push origin main` | Quality checks, testing, security scans |
+| **Pull Request** | Create PR to main | All checks + code review |
+| **Tag Release** | `git tag prod/v1.0.0 && git push origin prod/v1.0.0` | Full pipeline, deployment, health verification |
 
 ---
 
@@ -430,13 +436,50 @@ X-XSS-Protection: 1; mode=block
 
 ### Development Commands
 
-| **Installation** | **Testing** | **Code Quality** |
-|:---|:---|:---|
-| ```bash<br/>make install<br/>make install-dev<br/>``` | ```bash<br/>make test<br/>make test-unit<br/>make test-integration<br/>make test-coverage<br/>``` | ```bash<br/>make format<br/>make lint<br/>make security-check<br/>``` |
-| **Development** | **Database** | **Docker** |
-| ```bash<br/>make dev<br/>make prod<br/>make clean<br/>make pre-deploy<br/>``` | ```bash<br/>make db-init<br/>make db-migrate<br/>``` | ```bash<br/>make docker-build<br/>make docker-run<br/>make docker-stop<br/>make docker-logs<br/>``` |
-| **Utilities** | **Pre-commit** | **CI/CD** |
-| ```bash<br/>make help<br/>make validate-requirements<br/>make docs<br/>``` | ```bash<br/>make pre-commit-install<br/>make pre-commit-run<br/>make pre-commit-update<br/>``` | ```bash<br/>make ci<br/>make create-prod-tag<br/>``` |
+**Installation**
+- `make install` - Install production dependencies
+- `make install-dev` - Install development dependencies
+
+**Testing**
+- `make test` - Run all tests
+- `make test-unit` - Run unit tests
+- `make test-integration` - Run integration tests
+- `make test-coverage` - Generate coverage report
+
+**Code Quality**
+- `make format` - Format code with Black and isort
+- `make lint` - Run linting checks
+- `make security-check` - Run security scans
+
+**Development**
+- `make dev` - Run development server
+- `make prod` - Run production server
+- `make clean` - Clean temporary files
+- `make pre-deploy` - Pre-deployment checks
+
+**Database**
+- `make db-init` - Initialize database
+- `make db-migrate` - Run migrations
+
+**Docker**
+- `make docker-build` - Build Docker image
+- `make docker-run` - Run Docker container
+- `make docker-stop` - Stop Docker container
+- `make docker-logs` - View Docker logs
+
+**Pre-commit**
+- `make pre-commit-install` - Install pre-commit hooks
+- `make pre-commit-run` - Run pre-commit checks
+- `make pre-commit-update` - Update pre-commit hooks
+
+**CI/CD**
+- `make ci` - Run CI pipeline locally
+- `make create-prod-tag` - Create production release tag
+
+**Utilities**
+- `make help` - Show all available commands
+- `make validate-requirements` - Validate requirements.txt
+- `make docs` - Generate documentation
 
 ---
 
@@ -446,9 +489,20 @@ X-XSS-Protection: 1; mode=block
 
 ### Tag-Based Deployment
 
-| **Create Release** | **Version Format** |
-|:---|:---|
-| ```bash<br/># Using release script<br/>./scripts/create-prod-release.sh 1.0.0<br/><br/># Or manually<br/>git tag -a prod/v1.0.0 -m "Release v1.0.0"<br/>git push origin prod/v1.0.0<br/>``` | ```bash<br/>prod/vMAJOR.MINOR.PATCH<br/><br/># Examples:<br/>prod/v1.0.0<br/>prod/v1.2.3<br/>prod/v2.0.0<br/>``` |
+**Using Release Script:**
+```bash
+./scripts/create-prod-release.sh 1.0.0
+```
+
+**Or Manually:**
+```bash
+git tag -a prod/v1.0.0 -m "Release v1.0.0"
+git push origin prod/v1.0.0
+```
+
+**Version Format:** `prod/vMAJOR.MINOR.PATCH`
+
+**Examples:** `prod/v1.0.0`, `prod/v1.2.3`, `prod/v2.0.0`
 
 ### Production Configuration
 
@@ -456,7 +510,7 @@ X-XSS-Protection: 1; mode=block
 # Production environment variables
 FLASK_ENV=production
 SECRET_KEY=your-production-secret-key
-DATABASE_URL=sqlite:///DudeWheresMyLambo.db
+DATABASE_URL=sqlite:///app.db
 CORS_ORIGINS=https://yourdomain.com
 RATE_LIMIT_ENABLED=True
 ENABLE_MONITORING=True
@@ -468,20 +522,18 @@ ENABLE_MONITORING=True
 
 ### Production Monitoring
 
-| **Health Checks** | **Status** | **Logging** |
+| **Endpoint** | **Purpose** | **Returns** |
 |:---|:---|:---|
-| *System Status* | *Service Info* | *Structured Logs* |
-| ```bash<br/>GET /health<br/>``` | ```bash<br/>GET /status<br/>``` | ```bash<br/># Python logging<br/>``` |
-| ✅ Application health | ✅ API version | ✅ Request logging |
-| ✅ Service status | ✅ Service name | ✅ Error logging |
-| ✅ Timestamp | ✅ Running status | ✅ Performance logs |
+| `GET /health` | System health check | Application health, service status, timestamp |
+| `GET /status` | Service information | API version, service name, running status |
+| **Logging** | Structured logging | Request logs, error logs, performance metrics |
 
 ### Health Check Response
 
 ```json
 {
   "status": "healthy",
-  "service": "dwml-backend",
+  "service": "flask-api-boilerplate",
   "timestamp": "2024-01-01T00:00:00.000000"
 }
 ```
@@ -490,7 +542,7 @@ ENABLE_MONITORING=True
 
 ```json
 {
-  "message": "DudeWheresMyLambo API Status : Running!",
+  "message": "Flask API Status: Running!",
   "version": "1.0.0"
 }
 ```
@@ -501,9 +553,12 @@ ENABLE_MONITORING=True
 
 ### Interactive API Documentation
 
-| **Health** | **Status** | **Welcome** | **GraphQL** |
-|:---|:---|:---|:---|
-| ```bash<br/>GET /health<br/>``` | ```bash<br/>GET /status<br/>``` | ```bash<br/>GET /<br/>``` | ```bash<br/>POST /graphql<br/>``` |
+| **Endpoint** | **Method** | **Description** |
+|:---|:---|:---|
+| `/health` | GET | System health check |
+| `/status` | GET | Service status and version |
+| `/` | GET | Welcome message |
+| `/graphql` | POST | GraphQL query interface |
 
 ### Main Endpoints
 
@@ -511,8 +566,7 @@ All endpoints are registered through the central router (`app/router.py`):
 
 | **Endpoint** | **Method** | **Description** | **Domain** |
 |:---|:---|:---|:---|
-| `/api/v1/process_request` | GET | Analyze crypto investment | `domain` |
-| `/api/v1/process_request_grpc` | GET | Analyze via gRPC | `domain` |
+| `/api/v1/example` | GET | Example API endpoint | `domain` |
 | `/api/v1/restricted` | GET | Authentication test | `domain` |
 | `/health` | GET | Health check | `router` |
 | `/status` | GET | API status | `router` |
@@ -521,36 +575,32 @@ All endpoints are registered through the central router (`app/router.py`):
 
 **Request Example:**
 ```bash
-GET /api/v1/process_request?symbol=BTC&investment=1000
+# Example domain endpoint (customize for your use case)
+GET /api/v1/example?param=value
+
+# Health check
+GET /health
+
+# Status
+GET /status
 ```
 
-**Response:**
+**Response Example:**
 ```json
 {
-  "message": {
-    "SYMBOL": "BTC",
-    "INVESTMENT": 1000.0,
-    "NUMBERCOINS": 0.05,
-    "PROFIT": 250.0,
-    "GROWTHFACTOR": 0.25,
-    "LAMBOS": 0.00125,
-    "GENERATIONDATE": "2024-01-01T00:00:00Z"
-  },
-  "graph_data": [
-    {"x": "2024-01-01 00:00:00", "y": 20000.0},
-    {"x": "2024-01-02 00:00:00", "y": 21000.0}
-  ]
+  "message": "Success",
+  "data": {
+    "id": 1,
+    "value": "example"
+  }
 }
 ```
 
 ### API Usage Examples
 
 ```bash
-# Analyze crypto investment
-curl "http://localhost:8080/api/v1/process_request?symbol=BTC&investment=1000"
-
-# Analyze via gRPC
-curl "http://localhost:8080/api/v1/process_request_grpc?symbol=ETH&investment=500"
+# Example API endpoint (customize for your use case)
+curl "http://localhost:8080/api/v1/example?param=value"
 
 # Health check
 curl http://localhost:8080/health
@@ -577,19 +627,16 @@ curl https://your-domain.com/health
 # API status
 curl https://your-domain.com/status
 
-# Analyze crypto investment
-curl "https://your-domain.com/api/v1/process_request?symbol=BTC&investment=1000"
-
-# Analyze via gRPC
-curl "https://your-domain.com/api/v1/process_request_grpc?symbol=ETH&investment=500"
+# Example API endpoint
+curl "https://your-domain.com/api/v1/example?param=value"
 ```
 
 #### GraphQL
 ```bash
-# GraphQL query
+# GraphQL query (customize for your schema)
 curl -X POST https://your-domain.com/graphql \
   -H "Content-Type: application/json" \
-  -d '{"query": "{ processRequest(symbol: \"BTC\", investment: 1000) { message graphData } }"}'
+  -d '{"query": "{ yourQuery { field1 field2 } }"}'
 ```
 
 ---
@@ -599,12 +646,12 @@ curl -X POST https://your-domain.com/graphql \
 ### Organized Codebase
 
 ```
-dwml-backend-flask/
+flask-api-boilerplate/
 ├── app/                      # Flask application
-│   ├── domain/              # Main DWML application domain (complete)
+│   ├── domain/              # Application domain (customize for your use case)
 │   │   ├── __init__.py      # Domain exports
-│   │   ├── models.py        # Domain models (Investment, PriceData)
-│   │   ├── services.py      # Business logic (CryptoAnalysisService)
+│   │   ├── models.py        # Domain models
+│   │   ├── services.py      # Business logic services
 │   │   ├── routes.py        # HTTP endpoints (REST API)
 │   │   ├── schemas.py       # Validation schemas (Marshmallow)
 │   │   ├── graphql_schema.py # GraphQL API schema
@@ -613,7 +660,7 @@ dwml-backend-flask/
 │   │   │   ├── api_pb2.py   # Generated Python code
 │   │   │   └── api_pb2_grpc.py # gRPC stubs
 │   │   ├── exceptions.py    # Domain-specific exceptions
-│   │   └── constants.py     # Domain constants (LAMBO_PRICE, etc.)
+│   │   └── constants.py     # Domain constants
 │   ├── shared/              # Shared infrastructure
 │   │   └── middleware/      # Cross-cutting concerns
 │   │       ├── __init__.py
@@ -653,7 +700,7 @@ dwml-backend-flask/
 
 Each domain owns its **entire vertical slice**:
 
-#### 🎯 `app/domain/` - DWML Application
+#### 🎯 `app/domain/` - Application Domain
 - **Business Logic**: `models.py`, `services.py`
 - **API Interfaces**: `routes.py` (REST), `graphql_schema.py` (GraphQL), `proto_files/` (gRPC)
 - **Validation**: `schemas.py` (Marshmallow)
@@ -678,9 +725,30 @@ Each domain owns its **entire vertical slice**:
 
 ### How to Contribute
 
-| **1. Fork & Clone** | **2. Create Branch** | **3. Make Changes** | **4. Submit PR** |
-|:---|:---|:---|:---|
-| ```bash<br/>git clone <your-fork><br/>cd flask-api-boilerplate<br/>``` | ```bash<br/>git checkout -b feature/your-feature<br/>``` | ```bash<br/># Make your changes<br/>make format<br/>make lint<br/>make test<br/>``` | ```bash<br/>git push origin feature/your-feature<br/># Create pull request<br/>``` |
+**1. Fork & Clone**
+```bash
+git clone <your-fork>
+cd flask-api-boilerplate
+```
+
+**2. Create Branch**
+```bash
+git checkout -b feature/your-feature
+```
+
+**3. Make Changes**
+```bash
+# Make your changes
+make format
+make lint
+make test
+```
+
+**4. Submit PR**
+```bash
+git push origin feature/your-feature
+# Create pull request on GitHub
+```
 
 ### Code Standards
 
