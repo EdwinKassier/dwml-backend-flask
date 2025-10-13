@@ -19,6 +19,13 @@ from .schemas import (
 )
 from .services import CryptoAnalysisService
 
+# Import tasks for Celery autodiscovery
+try:
+    from . import tasks  # noqa: F401
+except ImportError:
+    # Celery might not be available
+    pass
+
 __all__ = [
     "Investment",
     "PriceData",

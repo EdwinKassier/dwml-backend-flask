@@ -21,10 +21,6 @@ except ImportError:
     CORS_AVAILABLE = False
     CORS = None
 
-# Celery disabled - using SQLite only
-CELERY_AVAILABLE = False
-Celery = None
-
 # Initialize extensions only if available
 if SQLALCHEMY_AVAILABLE:
     db: Optional[SQLAlchemy] = SQLAlchemy()
@@ -36,8 +32,7 @@ if CORS_AVAILABLE:
 else:
     cors = None
 
-# Celery disabled
-celery = None
+# Note: Celery is initialized separately via celery_app.py factory
 
 
 def init_extensions(app: Flask) -> Flask:
@@ -48,8 +43,6 @@ def init_extensions(app: Flask) -> Flask:
     if CORS_AVAILABLE and cors is not None:
         cors.init_app(app)
 
-    # Celery disabled - no Redis
-    # if CELERY_AVAILABLE and celery:
-    #     celery.init_app(app)
+    # Celery is initialized separately in create_app via celery_app.py
 
     return app

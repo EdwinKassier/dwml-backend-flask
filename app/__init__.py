@@ -34,12 +34,14 @@ from .shared.middleware.cors import CORSConfig
 from .shared.middleware.error_handler import register_error_handlers
 from .shared.middleware.security import SecurityMiddleware
 
-# Celery disabled - using SQLite only
-CELERY_AVAILABLE = False
-Celery = None
+# Celery is imported conditionally
+try:
+    from celery import Celery
 
-# Celery disabled - using SQLite only
-celery = None
+    CELERY_AVAILABLE = True
+except ImportError:
+    CELERY_AVAILABLE = False
+    Celery = None
 
 
 def create_app(environment: Optional[str] = None) -> Flask:
@@ -64,9 +66,15 @@ def create_app(environment: Optional[str] = None) -> Flask:
     # Register error handlers
     register_error_handlers(app)
 
-    # Celery disabled - using SQLite only
-    # if CELERY_AVAILABLE and celery:
-    #     celery.config_from_object(app.config, force=True)
+    # Initialize Celery if available and enabled
+    if CELERY_AVAILABLE and app.config.get("ENABLE_CELERY", True):
+        from app.celery_app import create_celery_app
+
+        app.celery = create_celery_app(app)
+        app.logger.info("Celery initialized successfully")
+    else:
+        app.celery = None
+        app.logger.warning("Celery not available or disabled")
 
     # Register all domain routes
     register_routes(app)

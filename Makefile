@@ -123,3 +123,22 @@ create-prod-tag: ## Create production tag (usage: make create-prod-tag VERSION=1
 	@echo "Make sure all tests pass before creating the tag!"
 	@echo "Run 'make pre-deploy' first to verify everything is ready."
 	@echo "Then run: git tag prod-$(VERSION) && git push origin prod-$(VERSION)"
+
+# Celery
+celery-worker: ## Run Celery worker locally
+	celery -A celery_worker.celery worker --loglevel=info --concurrency=4
+
+celery-beat: ## Run Celery beat scheduler locally
+	celery -A celery_worker.celery beat --loglevel=info
+
+celery-flower: ## Run Flower monitoring dashboard
+	celery -A celery_worker.celery flower --port=5555
+
+celery-purge: ## Purge all tasks from queues
+	celery -A celery_worker.celery purge -f
+
+celery-status: ## Check Celery worker status
+	celery -A celery_worker.celery inspect active
+
+celery-stats: ## Show Celery worker statistics
+	celery -A celery_worker.celery inspect stats

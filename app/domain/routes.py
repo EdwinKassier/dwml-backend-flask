@@ -222,3 +222,143 @@ def restricted() -> Tuple[str, int, dict[str, str]]:
         200,
         {"ContentType": "application/json"},
     )
+
+
+@crypto_bp.route("/analyze_async", methods=["POST"])
+@rate_limit(limit=30, window=60)
+@security_enhanced_route
+def analyze_investment_async() -> Tuple[str, int, dict[str, str]]:
+    """
+    Submit crypto investment analysis as background task.
+
+    POST /api/v1/analyze_async
+    Body: {"symbol": "BTC", "investment": 1000, "user_id": "optional"}
+
+    Returns:
+        JSON with task ID for status checking
+    """
+    current_app.logger.info("Async investment analysis request received")
+
+    try:
+        # Check if Celery is available
+        if not hasattr(current_app, "celery") or current_app.celery is None:
+            return (
+                json.dumps(
+                    {
+                        "error": "Background tasks not available",
+                        "message": "Celery is not configured. Use /process_request for synchronous analysis.",
+                    }
+                ),
+                503,
+                {"Content-Type": "application/json"},
+            )
+
+        data = request.get_json()
+        if not data:
+            return (
+                json.dumps({"error": "Request body is required"}),
+                400,
+                {"Content-Type": "application/json"},
+            )
+
+        symbol = data.get("symbol", "").strip()
+        investment = data.get("investment", 0)
+        user_id = data.get("user_id")
+
+        if not symbol or investment <= 0:
+            return (
+                json.dumps({"error": "Valid symbol and investment required"}),
+                400,
+                {"Content-Type": "application/json"},
+            )
+
+        # Import and submit task
+        from app.domain.tasks import analyze_investment_async as analyze_task
+
+        task = analyze_task.delay(
+            symbol=symbol, amount=float(investment), user_id=user_id
+        )
+
+        return (
+            json.dumps(
+                {
+                    "message": "Analysis submitted successfully",
+                    "task_id": task.id,
+                    "status_url": f"/api/v1/task_status/{task.id}",
+                    "symbol": symbol,
+                    "amount": investment,
+                }
+            ),
+            202,
+            {"Content-Type": "application/json"},
+        )
+
+    except Exception as e:
+        current_app.logger.error(f"Error submitting async task: {e}", exc_info=True)
+        return (
+            json.dumps({"error": "Failed to submit task", "details": str(e)}),
+            500,
+            {"Content-Type": "application/json"},
+        )
+
+
+@crypto_bp.route("/task_status/<task_id>", methods=["GET"])
+@rate_limit(limit=60, window=60)
+def check_task_status(task_id: str) -> Tuple[str, int, dict[str, str]]:
+    """
+    Check status of background task.
+
+    GET /api/v1/task_status/<task_id>
+
+    Returns:
+        JSON with task status and result if completed
+    """
+    try:
+        if not hasattr(current_app, "celery") or current_app.celery is None:
+            return (
+                json.dumps({"error": "Background tasks not available"}),
+                503,
+                {"Content-Type": "application/json"},
+            )
+
+        from celery.result import AsyncResult
+
+        task = AsyncResult(task_id, app=current_app.celery)
+
+        response = {
+            "task_id": task_id,
+            "status": task.state,
+        }
+
+        if task.state == "PENDING":
+            response["message"] = "Task is waiting to be processed"
+        elif task.state == "STARTED":
+            response["message"] = "Task is being processed"
+        elif task.state == "PROGRESS":
+            response["message"] = "Task is in progress"
+            response["progress"] = task.info if task.info else {}
+        elif task.state == "SUCCESS":
+            response["message"] = "Task completed successfully"
+            response["result"] = task.result
+        elif task.state == "FAILURE":
+            response["message"] = "Task failed"
+            response["error"] = str(task.info)
+        elif task.state == "RETRY":
+            response["message"] = "Task is being retried"
+            response["retry_count"] = task.info.get("retry_count") if task.info else 0
+        else:
+            response["message"] = f"Task state: {task.state}"
+
+        return (
+            json.dumps(response),
+            200,
+            {"Content-Type": "application/json"},
+        )
+
+    except Exception as e:
+        current_app.logger.error(f"Error checking task status: {e}", exc_info=True)
+        return (
+            json.dumps({"error": "Failed to check task status", "details": str(e)}),
+            500,
+            {"Content-Type": "application/json"},
+        )

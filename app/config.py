@@ -18,13 +18,14 @@ class BaseConfig:
     TESTING = False
 
     # Database configuration
-    SQLALCHEMY_DATABASE_URI = os.environ.get(
-        "DATABASE_URL", "sqlite:///DudeWheresMyLambo.db"
-    )
+    SQLALCHEMY_DATABASE_URI = os.environ.get("DATABASE_URL", "sqlite:///app.db")
     SQLALCHEMY_TRACK_MODIFICATIONS = False
 
-    # Redis configuration (disabled - using SQLite only)
-    # REDIS_URL = os.environ.get('REDIS_URL', 'redis://localhost:6379/0')
+    # Celery configuration
+    CELERY_BROKER_URL = os.environ.get("CELERY_BROKER_URL", "redis://localhost:6379/0")
+    CELERY_RESULT_BACKEND = os.environ.get(
+        "CELERY_RESULT_BACKEND", "redis://localhost:6379/0"
+    )
 
     # API configuration
     API_KEY = os.environ.get("API_KEY")
@@ -47,8 +48,9 @@ class BaseConfig:
     RATE_LIMIT_PER_MINUTE = int(os.environ.get("RATE_LIMIT_PER_MINUTE", "60"))
 
     # Feature flags
-    ENABLE_CACHING = False  # Disabled - no Redis
+    ENABLE_CACHING = os.environ.get("ENABLE_CACHING", "False").lower() == "true"
     ENABLE_MONITORING = os.environ.get("ENABLE_MONITORING", "True").lower() == "true"
+    ENABLE_CELERY = os.environ.get("ENABLE_CELERY", "True").lower() == "true"
 
     # Performance settings
     REQUEST_TIMEOUT = int(os.environ.get("REQUEST_TIMEOUT", "30"))
@@ -124,9 +126,10 @@ class ProductionConfig(BaseConfig):
 
     DEBUG = False
     ENV = "production"
-    # Use PostgreSQL in production
+    # CRITICAL: Use PostgreSQL in production with Celery, NOT SQLite
+    # SQLite does not support concurrent writes from multiple Celery workers
     SQLALCHEMY_DATABASE_URI = os.environ.get(
-        "DATABASE_URL", "postgresql://user:password@localhost:5432/dwml_production"
+        "DATABASE_URL", "postgresql://user:password@localhost:5432/app_production"
     )
 
 

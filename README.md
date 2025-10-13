@@ -82,62 +82,63 @@ The boilerplate supports both **REST** and **GraphQL** endpoints, giving you fle
 | **Architecture** | **Security** | **Monitoring** | **Performance** |
 |:---|:---|:---|:---|
 | Domain-Driven Design | Security Scanning | Health Checks | SQLite Database |
-| Rich Domain Models | Dependency Checks | Structured Logging | Docker Optimization |
+| Rich Domain Models | Dependency Checks | Structured Logging | Background Tasks (Celery) |
 | Clean Separation | Authentication | Error Tracking | API Rate Limiting |
 
 ### Feature Categories
 
 <details>
-<summary><b>🔒 Security Features</b></summary>
+<summary><b>Security Features</b></summary>
 
-- ✅ **Security Headers**: X-Content-Type-Options, X-Frame-Options, X-XSS-Protection
-- ✅ **Input Validation**: Comprehensive parameter sanitization
-- ✅ **Rate Limiting**: Configurable rate limiting
-- ✅ **CORS Protection**: Configurable CORS policies
-- ✅ **Authentication**: Firebase authentication integration
-
-</details>
-
-<details>
-<summary><b>🏗️ Architecture</b></summary>
-
-- ✅ **Domain-Driven Design**: Two-domain architecture (domain + shared)
-- ✅ **Rich Domain Models**: Business logic encapsulated in models
-- ✅ **Service Layer**: Orchestration and business workflows
-- ✅ **Central Router**: Single registration point for all domains
-- ✅ **Clean Separation**: Clear boundaries between layers
+- **Security Headers**: X-Content-Type-Options, X-Frame-Options, X-XSS-Protection
+- **Input Validation**: Comprehensive parameter sanitization
+- **Rate Limiting**: Configurable rate limiting
+- **CORS Protection**: Configurable CORS policies
+- **Authentication**: Firebase authentication integration
 
 </details>
 
 <details>
-<summary><b>🔧 Infrastructure</b></summary>
+<summary><b>Architecture</b></summary>
 
-- ✅ **Database**: SQLite (lightweight, file-based)
-- ✅ **Containerization**: Multi-stage Docker builds
-- ✅ **Health Monitoring**: Application health checks
-- ✅ **Configuration**: Environment-based configuration
-- ✅ **Deployment**: Docker Compose support
-
-</details>
-
-<details>
-<summary><b>🧪 Testing & Quality</b></summary>
-
-- ✅ **Testing**: Comprehensive test suite (unit and integration)
-- ✅ **Coverage**: Automated coverage reporting
-- ✅ **Quality Tools**: Black, flake8, mypy, bandit, safety
-- ✅ **CI/CD**: Automated test runner and pipeline
-- ✅ **Fixtures**: Test fixtures and mock strategies
+- **Domain-Driven Design**: Two-domain architecture (domain + shared)
+- **Rich Domain Models**: Business logic encapsulated in models
+- **Service Layer**: Orchestration and business workflows
+- **Central Router**: Single registration point for all domains
+- **Clean Separation**: Clear boundaries between layers
 
 </details>
 
 <details>
-<summary><b>📚 Documentation</b></summary>
+<summary><b>Infrastructure</b></summary>
 
-- ✅ **API Docs**: OpenAPI 3.0 specification
-- ✅ **Deployment**: Comprehensive deployment guides
-- ✅ **Development**: Setup and development guides
-- ✅ **Monitoring**: Health monitoring documentation
+- **Database**: SQLite (lightweight, file-based)
+- **Background Tasks**: Celery with Redis for async operations
+- **Containerization**: Multi-stage Docker builds
+- **Health Monitoring**: Application health checks
+- **Configuration**: Environment-based configuration
+- **Deployment**: Docker Compose support
+
+</details>
+
+<details>
+<summary><b>Testing & Quality</b></summary>
+
+- **Testing**: Comprehensive test suite (unit and integration)
+- **Coverage**: Automated coverage reporting
+- **Quality Tools**: Black, flake8, mypy, bandit, safety
+- **CI/CD**: Automated test runner and pipeline
+- **Fixtures**: Test fixtures and mock strategies
+
+</details>
+
+<details>
+<summary><b>Documentation</b></summary>
+
+- **API Docs**: OpenAPI 3.0 specification
+- **Deployment**: Comprehensive deployment guides
+- **Development**: Setup and development guides
+- **Monitoring**: Health monitoring documentation
 
 </details>
 
@@ -154,18 +155,21 @@ flask-api-boilerplate/
 │   │   ├── models.py        # Domain models
 │   │   ├── services.py      # Business logic services
 │   │   ├── routes.py        # HTTP endpoints (REST API)
+│   │   ├── tasks.py         # Domain background tasks (Celery)
 │   │   ├── schemas.py       # Validation schemas (Marshmallow)
 │   │   ├── graphql_schema.py # GraphQL API schema
 │   │   ├── proto_files/     # gRPC protocol buffers
 │   │   ├── exceptions.py    # Domain-specific exceptions
 │   │   └── constants.py     # Domain constants
 │   ├── shared/              # Shared infrastructure
-│   │   └── middleware/      # Cross-cutting concerns
-│   │       ├── auth.py      # Firebase authentication
-│   │       ├── cors.py      # CORS configuration
-│   │       ├── error_handler.py # Centralized error handling
-│   │       ├── rate_limit.py # Rate limiting
-│   │       └── security.py  # Security headers
+│   │   ├── middleware/      # Cross-cutting concerns
+│   │   │   ├── auth.py      # Firebase authentication
+│   │   │   ├── cors.py      # CORS configuration
+│   │   │   ├── error_handler.py # Centralized error handling
+│   │   │   ├── rate_limit.py # Rate limiting
+│   │   │   └── security.py  # Security headers
+│   │   └── tasks.py         # Shared background tasks
+│   ├── celery_app.py        # Celery factory
 │   ├── router.py            # Central route registration
 │   ├── config.py            # Configuration management
 │   └── extensions.py        # Flask extensions (SQLAlchemy)
@@ -175,6 +179,7 @@ flask-api-boilerplate/
 ├── docs/                    # Documentation
 ├── scripts/                 # Deployment scripts
 ├── .github/workflows/       # CI/CD pipelines
+├── celery_worker.py        # Celery worker entry point
 ├── Dockerfile              # Container configuration
 ├── docker-compose.yml      # Docker Compose
 └── Makefile               # Development commands
@@ -188,6 +193,7 @@ This project follows a **clean domain-driven architecture**:
 The domain owns its **entire vertical slice**:
 - **Business Logic**: Rich domain models with business rules
 - **REST API**: HTTP endpoints via Flask blueprints
+- **Background Tasks**: Asynchronous operations via Celery
 - **GraphQL API**: Flexible query interface
 - **gRPC API**: Protocol buffer definitions
 - **Validation**: Request/response schemas
@@ -197,12 +203,16 @@ The domain owns its **entire vertical slice**:
 #### 🔧 **`shared/`** - Shared Infrastructure
 Cross-cutting concerns used by all domains:
 - **Middleware**: Authentication, CORS, rate limiting, security
+- **Background Tasks**: Infrastructure tasks (cleanup, notifications, exports)
 - *(Future)* Common utilities, helpers, reusable components
 
-### Database Architecture
+### Database & Queue Architecture
 
 - **Database**: SQLite (lightweight, file-based)
-- **Benefits**: No external dependencies, easy deployment, portable
+  - **Benefits**: No external dependencies, easy deployment, portable
+  - **Note**: Use PostgreSQL in production with Celery
+- **Message Queue**: Redis (for Celery background tasks)
+  - **Benefits**: Fast, reliable, simple setup
 
 ---
 
@@ -238,10 +248,10 @@ cd flask-api-boilerplate
 make install-dev
 
 # This will:
-# ✅ Install all Python dependencies
-# ✅ Set up pre-commit hooks
-# ✅ Configure development tools
-# ✅ Set up code quality tools
+# - Install all Python dependencies
+# - Set up pre-commit hooks
+# - Configure development tools
+# - Set up code quality tools
 ```
 
 </details>
@@ -292,25 +302,25 @@ make dev
 ```bash
 make install-dev
 ```
-- ✅ Easy setup with automated configuration
-- ✅ Pre-commit hooks enabled
-- ✅ All development tools included
+- Easy setup with automated configuration
+- Pre-commit hooks enabled
+- All development tools included
 
 **Docker Compose**
 ```bash
 docker-compose up -d
 ```
-- ✅ Isolated containerized environment
-- ✅ Easy cleanup and management
-- ✅ Production-like setup
+- Isolated containerized environment
+- Easy cleanup and management
+- Production-like setup
 
 **Manual Installation**
 ```bash
 pip install -r requirements.txt
 ```
-- ✅ Full control over installation
-- ✅ Flexible setup options
-- ✅ Custom dependency management
+- Full control over installation
+- Flexible setup options
+- Custom dependency management
 
 ### Docker Installation
 
@@ -330,8 +340,11 @@ docker-compose down
 
 **Services included:**
 - Web application (Flask)
+- Redis (message broker)
+- Celery worker (background tasks)
+- Celery beat (scheduled tasks)
+- Flower (task monitoring at http://localhost:5555)
 - Database (SQLite)
-- Monitoring (Health checks)
 
 </details>
 
@@ -456,6 +469,13 @@ X-XSS-Protection: 1; mode=block
 - `make prod` - Run production server
 - `make clean` - Clean temporary files
 - `make pre-deploy` - Pre-deployment checks
+
+**Background Tasks (Celery)**
+- `make celery-worker` - Run Celery worker
+- `make celery-beat` - Run Celery beat scheduler
+- `make celery-flower` - Run Flower monitoring dashboard
+- `make celery-status` - Check worker status
+- `make celery-purge` - Purge all tasks from queues
 
 **Database**
 - `make db-init` - Initialize database
@@ -653,6 +673,7 @@ flask-api-boilerplate/
 │   │   ├── models.py        # Domain models
 │   │   ├── services.py      # Business logic services
 │   │   ├── routes.py        # HTTP endpoints (REST API)
+│   │   ├── tasks.py         # Domain background tasks (Celery)
 │   │   ├── schemas.py       # Validation schemas (Marshmallow)
 │   │   ├── graphql_schema.py # GraphQL API schema
 │   │   ├── proto_files/     # gRPC protocol buffers
@@ -662,13 +683,15 @@ flask-api-boilerplate/
 │   │   ├── exceptions.py    # Domain-specific exceptions
 │   │   └── constants.py     # Domain constants
 │   ├── shared/              # Shared infrastructure
-│   │   └── middleware/      # Cross-cutting concerns
-│   │       ├── __init__.py
-│   │       ├── auth.py      # Firebase authentication
-│   │       ├── cors.py      # CORS configuration
-│   │       ├── error_handler.py # Centralized error handling
-│   │       ├── rate_limit.py # Rate limiting
-│   │       └── security.py  # Security headers
+│   │   ├── middleware/      # Cross-cutting concerns
+│   │   │   ├── __init__.py
+│   │   │   ├── auth.py      # Firebase authentication
+│   │   │   ├── cors.py      # CORS configuration
+│   │   │   ├── error_handler.py # Centralized error handling
+│   │   │   ├── rate_limit.py # Rate limiting
+│   │   │   └── security.py  # Security headers
+│   │   └── tasks.py         # Shared background tasks
+│   ├── celery_app.py        # Celery factory
 │   ├── router.py            # Central route registration
 │   ├── config.py            # Configuration management
 │   ├── extensions.py        # Flask extensions (SQLAlchemy, etc.)
@@ -680,12 +703,15 @@ flask-api-boilerplate/
 │   └── conftest.py         # Pytest configuration
 ├── docs/                    # Documentation
 │   ├── Architecture.png    # Architecture diagram
-│   └── BuildPipeline.png   # CI/CD pipeline diagram
+│   ├── BuildPipeline.png   # CI/CD pipeline diagram
+│   ├── DDD_CELERY_AUDIT.md # DDD compliance audit
+│   └── CELERY_DDD_ARCHITECTURE.md # Celery architecture
 ├── scripts/                 # Utility scripts
 │   ├── create-prod-release.sh    # Production release script
 │   └── setup-pre-commit.sh       # Pre-commit setup
 ├── .github/workflows/       # CI/CD pipelines
 │   └── push.yml            # GitHub Actions workflow
+├── celery_worker.py        # Celery worker entry point
 ├── Dockerfile              # Container configuration
 ├── docker-compose.yml      # Docker Compose setup
 ├── Makefile               # Development commands
@@ -703,21 +729,23 @@ Each domain owns its **entire vertical slice**:
 #### 🎯 `app/domain/` - Application Domain
 - **Business Logic**: `models.py`, `services.py`
 - **API Interfaces**: `routes.py` (REST), `graphql_schema.py` (GraphQL), `proto_files/` (gRPC)
+- **Background Tasks**: `tasks.py` (Celery async operations)
 - **Validation**: `schemas.py` (Marshmallow)
 - **Error Handling**: `exceptions.py`
 - **Configuration**: `constants.py`
 
 #### 🔧 `app/shared/` - Shared Infrastructure
 - **Middleware**: Authentication, CORS, rate limiting, security headers
+- **Background Tasks**: Infrastructure tasks (cleanup, notifications, exports)
 - *(Add shared utilities as needed)*
 
 **Key Benefits:**
-- ✅ Complete domain ownership (100% vertical slice)
-- ✅ Zero scattered code across folders
-- ✅ Clear separation of concerns
-- ✅ Easy to test, maintain, and scale
-- ✅ Simple to add new domains
-- ✅ True Domain-Driven Design
+- Complete domain ownership (100% vertical slice)
+- Zero scattered code across folders
+- Clear separation of concerns (sync + async operations)
+- Easy to test, maintain, and scale
+- Simple to add new domains
+- True Domain-Driven Design
 
 ---
 
