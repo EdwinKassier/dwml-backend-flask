@@ -28,12 +28,14 @@ def create_celery_app(app: Optional[Flask] = None) -> Celery:
     """
     celery = Celery(
         app.import_name if app else "app",
-        broker=app.config.get("CELERY_BROKER_URL")
-        if app
-        else "redis://localhost:6379/0",
-        backend=app.config.get("CELERY_RESULT_BACKEND")
-        if app
-        else "redis://localhost:6379/0",
+        broker=(
+            app.config.get("CELERY_BROKER_URL") if app else "redis://localhost:6379/0"
+        ),
+        backend=(
+            app.config.get("CELERY_RESULT_BACKEND")
+            if app
+            else "redis://localhost:6379/0"
+        ),
         include=["app.domain.tasks", "app.shared.tasks"],  # Auto-discover tasks
     )
 

@@ -152,8 +152,9 @@ The boilerplate supports both **REST** and **GraphQL** endpoints, giving you fle
 flask-api-boilerplate/
 ├── app/                      # Flask application
 │   ├── domain/              # Application domain (customize for your use case)
-│   │   ├── models.py        # Domain models
+│   │   ├── models.py        # Domain models (Entities + DB Models)
 │   │   ├── services.py      # Business logic services
+│   │   ├── repositories.py  # Data access repositories
 │   │   ├── routes.py        # HTTP endpoints (REST API)
 │   │   ├── tasks.py         # Domain background tasks (Celery)
 │   │   ├── schemas.py       # Validation schemas (Marshmallow)
@@ -162,6 +163,7 @@ flask-api-boilerplate/
 │   │   ├── exceptions.py    # Domain-specific exceptions
 │   │   └── constants.py     # Domain constants
 │   ├── shared/              # Shared infrastructure
+│   │   ├── database.py      # Database connection
 │   │   ├── middleware/      # Cross-cutting concerns
 │   │   │   ├── auth.py      # Firebase authentication
 │   │   │   ├── cors.py      # CORS configuration
@@ -670,8 +672,9 @@ flask-api-boilerplate/
 ├── app/                      # Flask application
 │   ├── domain/              # Application domain (customize for your use case)
 │   │   ├── __init__.py      # Domain exports
-│   │   ├── models.py        # Domain models
+│   │   ├── models.py        # Domain models (Entities + DB Models)
 │   │   ├── services.py      # Business logic services
+│   │   ├── repositories.py  # Data access repositories
 │   │   ├── routes.py        # HTTP endpoints (REST API)
 │   │   ├── tasks.py         # Domain background tasks (Celery)
 │   │   ├── schemas.py       # Validation schemas (Marshmallow)
@@ -683,6 +686,7 @@ flask-api-boilerplate/
 │   │   ├── exceptions.py    # Domain-specific exceptions
 │   │   └── constants.py     # Domain constants
 │   ├── shared/              # Shared infrastructure
+│   │   ├── database.py      # Database connection
 │   │   ├── middleware/      # Cross-cutting concerns
 │   │   │   ├── __init__.py
 │   │   │   ├── auth.py      # Firebase authentication
@@ -728,6 +732,7 @@ Each domain owns its **entire vertical slice**:
 
 #### 🎯 `app/domain/` - Application Domain
 - **Business Logic**: `models.py`, `services.py`
+- **Data Access**: `repositories.py`
 - **API Interfaces**: `routes.py` (REST), `graphql_schema.py` (GraphQL), `proto_files/` (gRPC)
 - **Background Tasks**: `tasks.py` (Celery async operations)
 - **Validation**: `schemas.py` (Marshmallow)
@@ -735,6 +740,7 @@ Each domain owns its **entire vertical slice**:
 - **Configuration**: `constants.py`
 
 #### 🔧 `app/shared/` - Shared Infrastructure
+- **Database**: `database.py` (Connection management)
 - **Middleware**: Authentication, CORS, rate limiting, security headers
 - **Background Tasks**: Infrastructure tasks (cleanup, notifications, exports)
 - *(Add shared utilities as needed)*

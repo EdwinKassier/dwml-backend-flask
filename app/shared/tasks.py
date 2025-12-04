@@ -253,9 +253,11 @@ def health_check() -> Dict[str, Any]:
     return {
         "status": "healthy",
         "timestamp": datetime.utcnow().isoformat(),
-        "worker_id": health_check.request.hostname
-        if hasattr(health_check, "request")
-        else "unknown",
+        "worker_id": (
+            health_check.request.hostname
+            if hasattr(health_check, "request")
+            else "unknown"
+        ),
     }
 
 

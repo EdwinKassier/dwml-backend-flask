@@ -26,6 +26,14 @@ except ImportError:
     # Celery might not be available
     pass
 
+from app.shared import shared_db
+
+from .repositories import KrakenPriceRepository, SqlAlchemyInvestmentRepository
+
+# Initialize repositories
+price_repo = KrakenPriceRepository(shared_db)
+investment_repo = SqlAlchemyInvestmentRepository(shared_db)
+
 __all__ = [
     "Investment",
     "PriceData",
@@ -42,4 +50,6 @@ __all__ = [
     "validate_crypto_request",
     "validate_health_response",
     "schema",
+    "price_repo",
+    "investment_repo",
 ]

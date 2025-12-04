@@ -6,3 +6,7 @@ try:
 except ImportError:
     # Celery might not be available
     pass
+
+from .database import Database
+
+shared_db = Database()

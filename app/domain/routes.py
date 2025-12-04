@@ -26,22 +26,11 @@ crypto_bp = Blueprint("crypto", __name__)
 
 def get_crypto_service() -> CryptoAnalysisService:
     """
-    Get crypto service instance.
-
-    NOTE: This needs to be wired up to your external infrastructure.
-    Import your repositories here and create the service:
-
-    Example:
-        from your_infrastructure import PriceRepository, InvestmentRepository
-        price_repo = PriceRepository(current_app.config['KRAKEN_API_URL'])
-        investment_repo = InvestmentRepository()
-        return CryptoAnalysisService(price_repo, investment_repo)
+    Get crypto service instance with wired infrastructure.
     """
-    # TODO: Wire up to external infrastructure
-    raise NotImplementedError(
-        "Connect to your external infrastructure here. "
-        "Import repositories and create CryptoAnalysisService."
-    )
+    from app.domain import investment_repo, price_repo
+
+    return CryptoAnalysisService(price_repo, investment_repo)
 
 
 @crypto_bp.before_request

@@ -4,6 +4,10 @@ from dataclasses import dataclass, field
 from datetime import datetime, timezone
 from decimal import Decimal
 
+from sqlalchemy import Column, DateTime, Float, Integer, String
+
+from app.shared.database import Base
+
 from .constants import (
     CURRENT_PERIOD_WEEKS,
     DATE_TIME_FORMAT,
@@ -182,3 +186,43 @@ class PriceData:
             {"x": timestamp.strftime(DATE_TIME_FORMAT), "y": float(price)}
             for timestamp, price in self.prices
         ]
+
+
+# Database Models
+
+
+class Results(Base):
+    """Class to represent a RESULTS object"""
+
+    __tablename__ = "RESULTS"
+
+    id = Column(Integer, primary_key=True)
+    QUERY = Column(String)
+    NUMBERCOINS = Column(Float)
+    PROFIT = Column(Float)
+    GROWTHFACTOR = Column(Float)
+    LAMBOS = Column(Float)
+    INVESTMENT = Column(Float)
+    SYMBOL = Column(String)
+    GENERATIONDATE = Column(DateTime)
+
+
+class OpeningAverage(Base):
+    """Class to represent an OPENING_AVERAGE object"""
+
+    __tablename__ = "OPENING_AVERAGE"
+
+    SYMBOL = Column(String, primary_key=True)
+    AVERAGE = Column(Float)
+
+
+class Logging(Base):
+    """Class to represent an LOGGING object"""
+
+    __tablename__ = "LOGGING"
+
+    id = Column(Integer, primary_key=True)
+    QUERY_ID = Column(Integer)
+    SYMBOL = Column(String)
+    INVESTMENT = Column(Float)
+    GENERATIONDATE = Column(DateTime)

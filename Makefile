@@ -90,7 +90,7 @@ docker-logs: ## View Docker logs
 
 # Development
 dev: ## Run development server
-	FLASK_ENV=development python run.py
+	FLASK_ENV=development python3 run.py
 
 prod: ## Run production server with gunicorn
 	gunicorn --bind 0.0.0.0:8080 --workers 4 --timeout 120 run:app
